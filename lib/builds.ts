@@ -15,25 +15,49 @@ export type Build = {
 
 export async function getBuilds(): Promise<Build[]> {
   const buildsDirectory = path.join(process.cwd(), 'content/builds')
-  const filenames = await fs.readdir(buildsDirectory)
+  const filenames = (await fs.readdir(buildsDirectory)).filter((filename) =>
+    filename.endsWith('.mdx')
+  )
 
   const builds = await Promise.all(
     filenames.map(async (filename) => {
-      const filePath = path.join(buildsDirectory, filename)
-      const fileContents = await fs.readFile(filePath, 'utf8')
-      const slug = filename.replace(/\.mdx$/, '')
-      const { frontmatter, code } = await serializeMDX(fileContents)
+      try {
+        const filePath = path.join(buildsDirectory, filename)
+        const fileContents = await fs.readFile(filePath, 'utf8')
+        if (fileContents.trim() === '') return null
 
-      return {
-        slug,
-        frontmatter: frontmatter as Build['frontmatter'],
-        code,
+        const slug = filename.replace(/\.mdx$/, '')
+        const { frontmatter, compiledSource: code } = await serializeMDX(
+          fileContents
+        )
+
+        if (
+          typeof frontmatter.title === 'string' &&
+          typeof frontmatter.description === 'string' &&
+          typeof frontmatter.href === 'string'
+        ) {
+          return {
+            slug,
+            frontmatter: {
+              title: frontmatter.title,
+              description: frontmatter.description,
+              href: frontmatter.href,
+              github:
+                typeof frontmatter.github === 'string'
+                  ? frontmatter.github
+                  : undefined,
+            },
+            code,
+          }
+        }
+      } catch (error) {
+        console.error(`Error processing ${filename}:`, error)
       }
+      return null
     })
   )
 
-  return builds.sort((a, b) => {
-    // Sort by title for now, can be changed later if a date is added to builds
-    return a.frontmatter.title.localeCompare(b.frontmatter.title)
-  })
+  return (builds.filter((build) => build !== null) as Build[]).sort((a, b) =>
+    a.frontmatter.title.localeCompare(b.frontmatter.title)
+  )
 }

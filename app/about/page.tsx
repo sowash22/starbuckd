@@ -15,19 +15,19 @@ export default function About() {
 
         <div className="space-y-6 text-base text-neutral-700 dark:text-neutral-300 leading-relaxed font-mono">
           <p className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-            I'm curious about everything.
+            I&apos;m curious about everything.
           </p>
           
           <p>
-            That curiosity drives everything I do. Whether it's understanding how things work, exploring new technologies, or diving deep into ideas that catch my attention—I can't help but want to know more.
+            That curiosity drives everything I do. Whether it&apos;s understanding how things work, exploring new technologies, or diving deep into ideas that catch my attention—I can&apos;t help but want to know more.
           </p>
           
           <p>
-            This site is where I share that curiosity. You'll find thoughts on engineering, AI, building things, and whatever else has captured my attention. Sometimes these are polished essays, sometimes they're rough notes. All of them come from a place of genuine interest and exploration.
+            This site is where I share that curiosity. You&apos;ll find thoughts on engineering, AI, building things, and whatever else has captured my attention. Sometimes these are polished essays, sometimes they&apos;re rough notes. All of them come from a place of genuine interest and exploration.
           </p>
 
           <p>
-            If you're curious too, or if something I've written resonates with you, feel free to reach out. I'm always interested in conversations with fellow explorers.
+            If you&apos;re curious too, or if something I&apos;ve written resonates with you, feel free to reach out. I&apos;m always interested in conversations with fellow explorers.
           </p>
 
           <div className="mt-12 pt-8 border-t border-dotted border-neutral-300 dark:border-neutral-700">

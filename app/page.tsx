@@ -1,17 +1,18 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getAllPosts } from '@/lib/posts'
-// import { builds } from '@/lib/builds'
+import { getBuilds } from '@/lib/builds'
 
 export const metadata: Metadata = {
   title: 'Home',
   description: 'Ashok Marannan - Curious about everything',
 }
 
-export default function Home() {
+export default async function Home() {
   const posts = getAllPosts().slice(0, 6)
-  // const homeBuilds = builds.slice(0, 6)
-  const homeBuilds = []
+  const allBuilds = await getBuilds();
+  const homeBuilds = allBuilds.slice(0, 6)
+  // const homeBuilds = []
 
   return (
     <div className="min-h-screen">
@@ -115,13 +116,13 @@ export default function Home() {
             <div className="space-y-4">
               {homeBuilds.map((b) => (
                 <div
-                  key={b.title}
+                  key={b.slug}
                   className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-12 group"
                 >
                   <div className="flex-shrink-0 sm:w-28">
-                    {b.github ? (
+                    {b.frontmatter.github ? (
                       <Link
-                        href={b.github}
+                        href={b.frontmatter.github}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-neutral-400 dark:text-neutral-500 font-mono hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors uppercase tracking-wider underline decoration-dotted underline-offset-4"
@@ -136,15 +137,15 @@ export default function Home() {
                   </div>
                   <div className="flex-1">
                     <Link
-                      href={b.href}
+                      href={b.frontmatter.href}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-lg text-neutral-900 dark:text-neutral-100 hover:text-neutral-600 dark:hover:text-neutral-400 transition-colors font-mono leading-snug"
                     >
-                      {b.title}
+                      {b.frontmatter.title}
                     </Link>
                     <p className="text-sm text-neutral-500 dark:text-neutral-500 font-mono mt-1">
-                      {b.description}
+                      {b.frontmatter.description}
                     </p>
                   </div>
                 </div>
