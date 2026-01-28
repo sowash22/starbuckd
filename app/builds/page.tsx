@@ -3,11 +3,11 @@ import Link from 'next/link'
 import { getBuilds } from '@/lib/builds'
 
 export const metadata: Metadata = {
-  title: 'Projects',
-  description: 'Projects by Ashok Marannan',
+  title: 'Builds',
+  description: 'Builds by Ashok Marannan',
 }
 
-export default async function Projects() {
+export default async function BuildsPage() {
   const builds = await getBuilds()
 
   return (

@@ -12,7 +12,7 @@ export default function Header() {
 
   const navLinks = [
     { href: '/writings', label: 'Writings' },
-    { href: '/projects', label: 'Projects' },
+    { href: '/builds', label: 'Builds' },
   ]
 
   const isActive = (href: string) => {

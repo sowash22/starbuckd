@@ -153,7 +153,7 @@ export default async function Home() {
 
               <div className="pt-6">
                 <Link
-                  href="/projects"
+                  href="/builds"
                   className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 underline decoration-dotted underline-offset-4 decoration-neutral-400 dark:decoration-neutral-600 hover:decoration-neutral-600 dark:hover:decoration-neutral-400 transition-colors font-mono inline-flex items-center gap-2 group"
                 >
                   more builds
