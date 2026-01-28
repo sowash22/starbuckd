@@ -28,7 +28,7 @@ export default function SearchButton({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (query.trim()) {
-      router.push(`/blog?search=${encodeURIComponent(query.trim())}`)
+      router.push(`/writings?search=${encodeURIComponent(query.trim())}`)
       setIsOpen(false)
       setQuery('')
     }

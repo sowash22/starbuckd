@@ -1,11 +1,11 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
-import { BlogPost, BlogFrontmatter } from '@/types/blog'
+import { WritingsPost, WritingsFrontmatter } from '@/types/writings'
 
-const postsDirectory = path.join(process.cwd(), 'content/blog')
+const postsDirectory = path.join(process.cwd(), 'content/writings')
 
-export function getAllPosts(): BlogPost[] {
+export function getAllPosts(): WritingsPost[] {
   // Get all files in the posts directory
   const fileNames = fs.existsSync(postsDirectory)
     ? fs.readdirSync(postsDirectory)
@@ -25,7 +25,7 @@ export function getAllPosts(): BlogPost[] {
       const { data, content } = matter(fileContents)
 
       // Validate and type the frontmatter
-      const frontmatter: BlogFrontmatter = {
+      const frontmatter: WritingsFrontmatter = {
         title: data.title || 'Untitled',
         date: data.date || new Date().toISOString(),
         summary: data.summary || '',
@@ -47,7 +47,7 @@ export function getAllPosts(): BlogPost[] {
   })
 }
 
-export function getPostBySlug(slug: string): BlogPost | null {
+export function getPostBySlug(slug: string): WritingsPost | null {
   const posts = getAllPosts()
   return posts.find((post) => post.slug === slug) || null
 }

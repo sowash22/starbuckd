@@ -11,13 +11,13 @@ export default function Header() {
   const pathname = usePathname()
 
   const navLinks = [
-    { href: '/blog', label: 'Writings' },
+    { href: '/writings', label: 'Writings' },
     { href: '/projects', label: 'Projects' },
   ]
 
   const isActive = (href: string) => {
-    if (href === '/blog') {
-      return pathname === '/blog' || pathname.startsWith('/blog/')
+    if (href === '/writings') {
+      return pathname === '/writings' || pathname.startsWith('/writings/')
     }
     return pathname === href
   }

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Thoughts, notes, and write-ups',
 }
 
-export default function BlogPage() {
+export default function WritingsPage() {
   const posts = getAllPosts()
 
   return (
@@ -40,7 +40,7 @@ export default function BlogPage() {
                     {formattedDate}
                   </time>
                   <Link
-                    href={`/blog/${post.slug}`}
+                    href={`/writings/${post.slug}`}
                     className="text-base text-neutral-900 dark:text-neutral-100 hover:text-neutral-600 dark:hover:text-neutral-400 underline decoration-dotted underline-offset-4 decoration-neutral-400 dark:decoration-neutral-600 hover:decoration-neutral-600 dark:hover:decoration-neutral-400 transition-colors font-mono flex-1"
                   >
                     {post.frontmatter.title}

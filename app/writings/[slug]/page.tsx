@@ -6,7 +6,7 @@ import { getAllPostSlugs, getPostBySlug } from '@/lib/posts'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 
-interface BlogPostPageProps {
+interface WritingsPostPageProps {
   params: Promise<{ slug: string }>
 }
 
@@ -19,7 +19,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: BlogPostPageProps): Promise<Metadata> {
+}: WritingsPostPageProps): Promise<Metadata> {
   const { slug } = await params
   const post = getPostBySlug(slug)
 
@@ -35,7 +35,7 @@ export async function generateMetadata({
   }
 }
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
+export default async function WritingsPostPage({ params }: WritingsPostPageProps) {
   const { slug } = await params
   const post = getPostBySlug(slug)
 
@@ -56,7 +56,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     <div className="min-h-screen">
       <article className="mx-auto max-w-4xl px-6 py-12">
         <Link
-          href="/blog"
+          href="/writings"
           className="inline-flex items-center text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 mb-8 transition-colors font-mono"
         >
           <svg

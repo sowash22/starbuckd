@@ -37,10 +37,10 @@ export default function NotFound() {
             </svg>
           </Link>
           <Link
-            href="/blog"
+            href="/writings"
             className="inline-flex items-center justify-center px-6 py-3.5 text-base font-semibold text-neutral-900 dark:text-neutral-100 border-2 border-neutral-900 dark:border-neutral-100 rounded-full hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900 transition-all duration-200"
           >
-            Read Blog
+            Read Writings
           </Link>
         </div>
       </div>

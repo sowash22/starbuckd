@@ -1,15 +1,15 @@
-# Personal Site + Blog
+# Personal Site + Writings
 
-A Next.js personal site and blog built with TypeScript, App Router, and MDX.
+A Next.js personal site and writings built with TypeScript, App Router, and MDX.
 
 ## Features
 
 - ✅ TypeScript-first development
 - ✅ Next.js App Router
-- ✅ MDX/Markdown blog posts
+- ✅ MDX/Markdown writings
 - ✅ Tailwind CSS with typography plugin
 - ✅ Static site generation
-- ✅ Type-safe blog utilities
+- ✅ Type-safe writings utilities
 - ✅ Dark mode support
 - ✅ SEO-friendly metadata
 
@@ -27,7 +27,7 @@ npm install
 npm run dev
 ```
 
-3. Open [http://localhost:3000](http://localhost:3000) in your browser.
+3. Open [http://localhost:3000](http://localhost://localhost:3000) in your browser.
 
 ## Project Structure
 
@@ -37,31 +37,31 @@ app/
 ├── page.tsx                # Home page
 ├── about/
 │   └── page.tsx           # About page
-├── blog/
-│   ├── page.tsx           # Blog index
+├── writings/
+│   ├── page.tsx           # Writings index
 │   └── [slug]/
-│       └── page.tsx       # Individual blog post
+│       └── page.tsx       # Individual writings post
 ├── components/
 │   ├── Header.tsx
 │   ├── Footer.tsx
-│   └── BlogCard.tsx
+│   └── WritingsCard.tsx
 └── globals.css
 
-content/blog/              # Blog posts (MDX/Markdown)
+content/writings/              # Writings posts (MDX/Markdown)
 ├── doing-things-badly.mdx
 └── notes-on-agents.mdx
 
 lib/
-├── posts.ts               # Blog utilities
+├── posts.ts               # Writings utilities
 └── mdx.ts                 # MDX serialization
 
 types/
-└── blog.ts                # TypeScript types
+└── writings.ts                # TypeScript types
 ```
 
-## Adding Blog Posts
+## Adding Writings Posts
 
-Create a new `.mdx` or `.md` file in `content/blog/` with frontmatter:
+Create a new `.mdx` or `.md` file in `content/writings/` with frontmatter:
 
 ```mdx
 ---
@@ -89,7 +89,7 @@ This site is optimized for static export and can be deployed to:
 - Update metadata in `app/layout.tsx`
 - Customize styles in `tailwind.config.ts`
 - Modify components in `app/components/`
-- Add your own content in `content/blog/`
+- Add your own content in `content/writings/`
 
 ## Tech Stack
 

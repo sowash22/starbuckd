@@ -78,7 +78,7 @@ export default async function Home() {
                       {formattedDate}
                     </time>
                     <Link
-                      href={`/blog/${post.slug}`}
+                      href={`/writings/${post.slug}`}
                       className="text-lg text-neutral-900 dark:text-neutral-100 hover:text-neutral-600 dark:hover:text-neutral-400 transition-colors font-mono flex-1 leading-snug"
                     >
                       {post.frontmatter.title}
@@ -90,7 +90,7 @@ export default async function Home() {
               {posts.length > 0 && (
                 <div className="pt-6">
                   <Link
-                    href="/blog"
+                    href="/writings"
                     className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 underline decoration-dotted underline-offset-4 decoration-neutral-400 dark:decoration-neutral-600 hover:decoration-neutral-600 dark:hover:decoration-neutral-400 transition-colors font-mono inline-flex items-center gap-2 group"
                   >
                     view all posts 

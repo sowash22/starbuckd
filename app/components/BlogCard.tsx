@@ -1,12 +1,12 @@
 import Link from 'next/link'
-import { BlogPost } from '@/types/blog'
+import { WritingsPost } from '@/types/writings'
 
-interface BlogCardProps {
-  post: BlogPost
+interface WritingsCardProps {
+  post: WritingsPost
   featured?: boolean
 }
 
-export default function BlogCard({ post, featured = false }: BlogCardProps) {
+export default function WritingsCard({ post, featured = false }: WritingsCardProps) {
   const formattedDate = new Date(post.frontmatter.date).toLocaleDateString(
     'en-US',
     {
@@ -20,7 +20,7 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
     return (
       <article className="group relative">
         <Link
-          href={`/blog/${post.slug}`}
+          href={`/writings/${post.slug}`}
           className="block overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-50 to-white dark:from-neutral-800 dark:to-neutral-900 border border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 transition-all duration-300 hover:shadow-2xl"
         >
           <div className="p-6 md:p-8 lg:p-10">
@@ -79,7 +79,7 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
   return (
     <article className="group">
       <Link
-        href={`/blog/${post.slug}`}
+        href={`/writings/${post.slug}`}
         className="block p-6 md:p-8 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 bg-white dark:bg-neutral-900 hover:shadow-lg transition-all duration-300"
       >
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
