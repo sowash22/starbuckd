@@ -5,6 +5,7 @@ import rehypeHighlight from 'rehype-highlight'
 
 export async function serializeMDX(content: string) {
   return serialize(content, {
+    parseFrontmatter: true, // Explicitly enable frontmatter parsing
     mdxOptions: {
       remarkPlugins: [remarkGfm],
       rehypePlugins: [rehypeHighlight as any],
