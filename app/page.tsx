@@ -50,15 +50,15 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Featured Posts */}
+        {/* Featured Writings */}
         <section className="mb-16">
           <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-8 font-mono">
-            posts
+            writings
           </h2>
           
           {posts.length === 0 ? (
             <p className="text-neutral-600 dark:text-neutral-400 font-mono">
-              No posts yet. Check back soon!
+              No writings yet. Check back soon!
             </p>
           ) : (
             <div className="space-y-4">
@@ -91,9 +91,9 @@ export default async function Home() {
                 <div className="pt-6">
                   <Link
                     href="/writings"
-                    className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 underline decoration-dotted underline-offset-4 decoration-neutral-400 dark:decoration-neutral-600 hover:decoration-neutral-600 dark:hover:decoration-neutral-400 transition-colors font-mono inline-flex items-center gap-2 group"
+                    className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 underline decoration-dotted underline-offset-4 decoration-neutral-400 dark:decoration-neutral-600 hover:decoration-600 dark:hover:decoration-neutral-400 transition-colors font-mono inline-flex items-center gap-2 group"
                   >
-                    view all posts 
+                    view all writings 
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                   </Link>
                 </div>
