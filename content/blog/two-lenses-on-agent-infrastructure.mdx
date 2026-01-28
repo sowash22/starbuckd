@@ -1,0 +1,45 @@
+---
+title: "Two Lenses on Agent Infrastructure"
+date: "2025-08-28"
+summary: "Running agents is an engineering problem, but agents interacting with society is a governance problem."
+tags:
+  - AI
+  - infrastructure
+  - governance
+  - agents
+---
+
+Agent infrastructure looks different depending on who’s building it and what problem they’re solving.
+
+I stumbled upon two pieces on “agent infrastructure” — one from LangChain engineers and another from Oxford/Cambridge academics.
+
+Same topic. Completely different lens.
+
+## Engineering problem: “How do we actually run these things?”
+
+Agents aren’t like normal software. They run for minutes and hours, not milliseconds. They pause for human input and resume later. They need persistent state across crashes and timeouts. They need enormous amounts of compute and data. Traditional serverless and microservice architectures are not built for these workloads.
+
+Their solution: Build infrastructure with durable execution, checkpointing, task queues for bursty traffic, and real-time streaming of intermediate outputs, tool calls, traces, and human-in-the-loop systems.
+
+## Academics’ problem: “What happens when agents interact with society?”
+
+When AI agents buy things online, who’s legally responsible? How do we prevent fraud? What if agents need to negotiate with each other?
+
+Their solution: Build governance protocols — identity systems, certification, rollback mechanisms.
+
+It’s like the early internet all over again. You needed TCP/UDP to make computers talk. But you also needed HTTPS/SSL/TLS to make it trustworthy. Both layers were essential.
+
+We’re doing the same thing with agents right now:
+
+- Engineers solving execution and scaling problems
+- Researchers solving governance problems
+
+Why this matters:
+
+Because we’re not just building better chatbots. We’re building artificial entities that will make purchases, negotiate contracts, diagnose medical conditions, handle transactions, and run autonomously in our economy.
+
+Sources:
+
+- `https://lnkd.in/gMjcqWyE`
+- `https://lnkd.in/g4Sm6waY`
+

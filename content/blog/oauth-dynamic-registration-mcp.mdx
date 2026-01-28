@@ -1,0 +1,66 @@
+---
+title: "OAuth Dynamic Registration for MCP"
+date: "2025-06-28"
+summary: "OAuth is becoming core to MCP, and dynamic client registration makes secure agent-to-tool connections scalable."
+tags:
+  - OAuth
+  - security
+  - MCP
+  - agents
+---
+
+OAuth with Dynamic Registration is the missing link in secure MCP for scaling AI agents.
+
+## OAuth primer
+
+You’ve a Google account, and you can log into Gmail to read your emails. That’s fine and dandy. But what if you want to let an AI agent or a third-party tool access your Gmail — maybe to summarize your inbox for the day or schedule a meeting or create action items?
+
+You definitely don’t want to give it your Google username and password. That’s exactly what OAuth was built for.
+
+OAuth is the protocol that lets applications securely access your data on your behalf, with your permission, and without sharing your login credentials.
+
+If you’ve ever used “Login with Google” or “Sign in with Facebook” — that’s OAuth in action.
+
+## A quick overview: how OAuth works
+
+1. You visit a third-party app or AI agent that needs access to your Gmail, Jira, or calendar.
+2. It redirects you to the identity provider — like Google, Microsoft, or Atlassian.
+3. You log in and grant consent to allow limited access.
+4. The identity provider sends back an authorization code.
+5. The app exchanges that code for an access token.
+6. That token is used to securely call APIs and retrieve data — like calendar events or Jira issues — on your behalf.
+
+This lets apps and agents access your data safely, without ever seeing your password.
+
+## Why OAuth is back in the spotlight: AI agents and MCP
+
+Model Context Protocol (MCP) — an open standard by Anthropic — lets AI agents call external tools to fetch real-world context: documents, calendar events, emails, and more.
+
+But MCP originally lacked something critical:
+
+- A standardized, secure way to authorize agents to access user data.
+
+## That’s where OAuth comes in
+
+OAuth fills that gap — enabling agents to act on behalf of users securely, with explicit consent and well-scoped access.
+
+## The scaling problem
+
+Traditional OAuth requires every app or agent to be manually registered with each tool provider. That doesn’t scale in a world where agents are dynamically discovering new tools at runtime.
+
+## The fix: dynamic client registration
+
+The latest MCP update (2025-06-18) introduces OAuth Dynamic Client Registration, allowing agents to:
+
+- Register themselves on the fly
+- Skip manual setup
+- Still use secure, standards-based OAuth flows
+
+This unlocks:
+
+- Seamless, secure agent-to-tool connections
+- Scalable onboarding
+- User consent + access control — without extra complexity and pre-setup
+
+OAuth is now core to MCP, enabling AI agents to securely connect with tools — and dynamic registration makes it scalable and seamless.
+

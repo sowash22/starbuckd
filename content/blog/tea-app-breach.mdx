@@ -1,0 +1,32 @@
+---
+title: "Tea App Breach"
+date: "2025-08-28"
+summary: "A trust-and-safety product asked for everything, then stored it like it was disposable."
+tags:
+  - security
+  - privacy
+  - product
+---
+
+Honestly surprised I didn’t see many (if not any) posts on the recent Tea app breach.
+
+Tea is a women focused app designed to enhance dating safety. Basically women can share about their bad dates and red flags about men they dated — potentially helping other women. It was supposed to be the “safe” dating app for women. Women had to upload their government ID to get verified. The whole point was trust and safety.
+
+Last week, hackers got into their systems twice.
+
+First, they stole 72,000 photos including 13,000 government IDs and selfies.
+
+A few days later? 1.1 million private messages from the last two years.
+
+The worst part? It was completely preventable. The data was sitting in an unsecured Firebase storage bucket — completely unencrypted and publicly accessible. Firebase literally sends warnings when you leave buckets open like this. Tea ignored them.
+
+Even worse, their app told users selfies would be “deleted after verification.” They weren’t. Everything was just sitting there on the internet waiting to be found by some bad people.
+
+Tea has disabled messaging entirely now. But the damage is done. The data was dumped on 4chan, and developers have already built apps to exploit it — mapping user locations, ranking photos, data mining personal conversations.
+
+This isn’t just about one app failing. It’s about how we’re building technology that asks for everything and protects nothing. We demand government IDs, phone numbers, photos, location data — then store it all like it’s disposable.
+
+I work in tech. I’ve seen this pattern over and over. Companies collect sensitive data “for safety” but treat security as an afterthought. The Tea breach could happen to any platform we use daily.
+
+What scares me most? Tea was specifically marketed to women seeking safety. The irony is devastating.
+
