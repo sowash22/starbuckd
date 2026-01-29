@@ -26,7 +26,6 @@ export default function WritingsPage() {
             {posts.map((post) => {
               const date = new Date(post.frontmatter.date)
               const formattedDate = date.toLocaleDateString('en-GB', {
-                day: 'numeric',
                 month: 'short',
                 year: 'numeric',
               })

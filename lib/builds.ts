@@ -8,6 +8,7 @@ export type Build = {
     title: string
     description: string
     href: string
+    date: string
     github?: string
   }
   code: string
@@ -36,7 +37,8 @@ export async function getBuilds(): Promise<Build[]> {
         if (
           typeof frontmatter.title === 'string' &&
           typeof frontmatter.description === 'string' &&
-          typeof frontmatter.href === 'string'
+          typeof frontmatter.href === 'string' &&
+          typeof frontmatter.date === 'string'
         ) {
           return {
             slug,
@@ -44,6 +46,7 @@ export async function getBuilds(): Promise<Build[]> {
               title: frontmatter.title,
               description: frontmatter.description,
               href: frontmatter.href,
+              date: frontmatter.date,
               github:
                 typeof frontmatter.github === 'string'
                   ? frontmatter.github
@@ -59,7 +62,7 @@ export async function getBuilds(): Promise<Build[]> {
     })
   )
 
-  return (builds.filter((build) => build !== null) as Build[]).sort((a, b) =>
-    a.frontmatter.title.localeCompare(b.frontmatter.title)
-  )
+  return (builds.filter((build) => build !== null) as Build[]).sort((a, b) => {
+    return new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime()
+  })
 }
