@@ -33,14 +33,14 @@ export default function WritingsPage() {
               return (
                 <div
                   key={post.slug}
-                  className="flex items-start gap-6 py-2 group"
+                  className="py-2 group flex flex-col md:flex-row md:items-baseline md:justify-between"
                 >
-                  <time className="text-sm text-neutral-500 dark:text-neutral-500 font-mono flex-shrink-0 w-24">
+                  <time className="text-sm text-neutral-500 dark:text-neutral-500 font-mono mb-1 md:mb-0 md:flex-shrink-0">
                     {formattedDate}
                   </time>
                   <Link
                     href={`/writings/${post.slug}`}
-                    className="text-base text-neutral-900 dark:text-neutral-100 hover:text-neutral-600 dark:hover:text-neutral-400 underline decoration-dotted underline-offset-4 decoration-neutral-400 dark:decoration-neutral-600 hover:decoration-neutral-600 dark:hover:decoration-neutral-400 transition-colors font-mono flex-1"
+                    className="text-base text-neutral-900 dark:text-neutral-100 hover:text-neutral-600 dark:hover:text-neutral-400 underline decoration-dotted underline-offset-4 decoration-neutral-400 dark:decoration-neutral-600 hover:decoration-neutral-600 dark:hover:text-neutral-400 transition-colors font-mono md:text-right md:flex-1"
                   >
                     {post.frontmatter.title}
                   </Link>
