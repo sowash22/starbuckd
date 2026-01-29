@@ -4,7 +4,7 @@ import { getAllPosts } from '@/lib/posts'
 import { getBuilds } from '@/lib/builds'
 
 export const metadata: Metadata = {
-  title: 'Home',
+  title: 'Ashok Marannan',
   description: 'Ashok Marannan - Curious about everything',
 }
 
