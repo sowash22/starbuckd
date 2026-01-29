@@ -46,7 +46,6 @@ export default async function WritingsPostPage({ params }: WritingsPostPageProps
   const formattedDate = new Date(post.frontmatter.date).toLocaleDateString(
     'en-GB',
     {
-      day: 'numeric',
       month: 'short',
       year: 'numeric',
     }
@@ -79,13 +78,19 @@ export default async function WritingsPostPage({ params }: WritingsPostPageProps
           <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-neutral-100 mb-4 font-mono">
             {post.frontmatter.title}
           </h1>
-          <div className="flex items-center gap-3 text-sm text-neutral-500 dark:text-neutral-500 font-mono">
+          <div className="text-sm text-neutral-500 dark:text-neutral-500 font-mono">
             <time dateTime={post.frontmatter.date}>{formattedDate}</time>
             {post.frontmatter.tags && post.frontmatter.tags.length > 0 && (
-              <>
-                <span>·</span>
-                <span>{post.frontmatter.tags.join(', ')}</span>
-              </>
+              <p className="mt-2 text-xs uppercase">
+                {post.frontmatter.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-block bg-neutral-200 dark:bg-neutral-800 rounded-full px-3 py-1 text-xs font-semibold text-neutral-700 dark:text-neutral-300 mr-2 mb-2"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </p>
             )}
           </div>
         </header>

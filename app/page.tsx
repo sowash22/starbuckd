@@ -20,8 +20,8 @@ export default async function Home() {
         {/* About Section */}
         <section className="mb-16">
           <p className="text-base md:text-lg text-neutral-700 dark:text-neutral-300 leading-relaxed mb-6 font-mono">
-            I’m curious about how things work.
-            I write to understand and build things to learn.
+            I’m curious about how things work. <br />
+            I write to understand and build to learn.
           </p>
 
           <div className="flex items-center gap-4 text-sm text-neutral-600 dark:text-neutral-400">
@@ -53,7 +53,7 @@ export default async function Home() {
         {/* Featured Writings */}
         <section className="mb-16">
           <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-8 font-mono">
-            writings
+            Writings
           </h2>
 
           {posts.length === 0 ? (
@@ -105,7 +105,7 @@ export default async function Home() {
         {/* Builds */}
         <section>
           <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-8 font-mono">
-            builds
+            Builds
           </h2>
 
           {homeBuilds.length === 0 ? (
