@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body
-        className={`${jetbrainsMono.variable} font-mono min-h-screen flex flex-col bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 antialiased`}
+        className={`${jetbrainsMono.variable} font-mono min-h-screen flex flex-col bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 antialiased overflow-x-hidden`}
         suppressHydrationWarning
       >
         <Script id="theme-script" strategy="beforeInteractive">
