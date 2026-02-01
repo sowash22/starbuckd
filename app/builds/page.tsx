@@ -14,7 +14,7 @@ export default async function BuildsPage() {
     <div className="min-h-screen">
       <main className="mx-auto max-w-4xl px-6 py-12">
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-8 font-mono">
-          builds
+          Builds
         </h1>
 
         {builds.length === 0 ? (
@@ -24,16 +24,20 @@ export default async function BuildsPage() {
         ) : (
           <div className="space-y-4">
             {builds.map((b) => {
-              const year = b.frontmatter.date.split('-')[0]
+              const date = new Date(b.frontmatter.date)
+              const formattedDate = date.toLocaleDateString('en-GB', {
+                month: 'short',
+                year: 'numeric',
+              })
 
               return (
                 <div
                   key={b.slug}
                   className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-12 group"
                 >
-                  <div className="text-sm text-neutral-400 dark:text-neutral-500 font-mono flex-shrink-0 sm:w-28 uppercase tracking-wider">
-                    {year}
-                  </div>
+                  <time className="text-sm text-neutral-400 dark:text-neutral-500 font-mono flex-shrink-0 sm:w-28 uppercase tracking-wider">
+                    {formattedDate}
+                  </time>
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
                       <Link
