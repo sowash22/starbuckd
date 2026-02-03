@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense, useCallback } from "react";
+import { useState, useEffect, Suspense, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Coffee, RefreshCw, AlertCircle, Quote, ArrowRight, History, Trash2, CheckCircle2, UserCheck, ShieldCheck } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -29,21 +29,14 @@ function StarbuckdContent() {
   const [error, setError] = useState("");
   const [history, setHistory] = useState<{ name: string, date: string }[]>([]);
 
-  const handleButcher = useCallback(async (e: React.FormEvent | string) => {
-    const targetName = typeof e === 'string' ? e : name;
-    if (typeof e !== 'string') e.preventDefault();
+  const lastFetchedName = useRef<string | null>(null);
 
+  const performPrediction = useCallback(async (targetName: string) => {
     if (!targetName.trim()) return;
-
-    // Update URL query param
-    const params = new URLSearchParams(window.location.search);
-    params.set("name", targetName);
-    router.replace(`?${params.toString()}`, { scroll: false });
 
     setLoading(true);
     setError("");
     setPrediction(null);
-    if (typeof e === 'string') setName(targetName);
 
     try {
       const res = await fetch("/api/predict", {
@@ -57,28 +50,48 @@ function StarbuckdContent() {
       const data = await res.json();
       setPrediction(data);
 
-      const newHistory = [{ name: targetName, date: new Date().toISOString() }, ...history.filter(h => h.name !== targetName)].slice(0, 10);
-      setHistory(newHistory);
-      localStorage.setItem("starbuckd_history", JSON.stringify(newHistory));
+      setHistory(prev => {
+        const newHistory = [{ name: targetName, date: new Date().toISOString() }, ...prev.filter(h => h.name !== targetName)].slice(0, 10);
+        localStorage.setItem("starbuckd_history", JSON.stringify(newHistory));
+        return newHistory;
+      });
     } catch (err) {
       setError("The barista is confused. Try shouting again?");
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, [name, history, router]);
+  }, []);
+
+  const handleUpdateUrl = useCallback((targetName: string) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("name", targetName);
+    router.push(`?${params.toString()}`, { scroll: false });
+  }, [router]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (name.trim()) {
+      handleUpdateUrl(name.trim());
+    }
+  };
 
   useEffect(() => {
     const savedHistory = localStorage.getItem("starbuckd_history");
     if (savedHistory) setHistory(JSON.parse(savedHistory));
+  }, []);
 
-    // Check for name in URL on initial load
+  useEffect(() => {
     const nameParam = searchParams.get("name");
-    if (nameParam) {
+    if (nameParam && nameParam !== lastFetchedName.current) {
+      lastFetchedName.current = nameParam;
       setName(nameParam);
-      handleButcher(nameParam);
+      performPrediction(nameParam);
+    } else if (!nameParam) {
+      lastFetchedName.current = null;
+      setPrediction(null);
     }
-  }, [searchParams, handleButcher]);
+  }, [searchParams, performPrediction]);
 
   return (
     <div className="relative min-h-screen flex flex-col items-center pt-24 pb-12 px-4 overflow-hidden bg-background font-body">
@@ -92,8 +105,8 @@ function StarbuckdContent() {
 
       {/* Background Decorations */}
       <div className="fixed inset-0 pointer-events-none -z-10">
-        <div className="absolute -top-20 -right-20 w-96 h-96 bg-primary/20 blur-[120px] rounded-full" />
-        <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-secondary/20 blur-[120px] rounded-full" />
+        <div className="absolute -top-20 -right-20 w-96 h-96 bg-white/10 blur-[120px] rounded-full" />
+        <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-white/10 blur-[120px] rounded-full" />
       </div>
 
       <motion.div
@@ -110,22 +123,26 @@ function StarbuckdContent() {
           <Coffee className="w-3.5 h-3.5" />
           <span>Identity Crisis Simulator</span>
         </motion.div> */}
-        <h1 className="text-6xl md:text-8xl font-sans font-black tracking-tighter text-text leading-none uppercase">
-          Starbuck<span className="text-primary">&apos;d</span>
+        <h1 className="text-4xl sm:text-6xl md:text-8xl font-sans font-black tracking-tighter text-text leading-none uppercase text-center flex items-center justify-center gap-3 sm:gap-4">
+          <Coffee className="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 text-[#00704A] flex-shrink-0" />
+          Starbuck<span className="text-[#00704A]">&apos;d</span>
         </h1>
+        <p className="text-[10px] sm:text-xs font-bold text-text/40 text-center mt-2 uppercase tracking-[0.3em] max-w-xs sm:max-w-md mx-auto leading-relaxed">
+          Grande Misunderstanding? <br className="sm:hidden" /> Find your safe alias to avoid the struggle.
+        </p>
         <div className="relative max-w-sm mx-auto w-full pt-4">
-          <form onSubmit={handleButcher} className="relative">
+          <form onSubmit={handleSubmit} className="relative">
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="What's your name?"
-              className="w-full pl-6 pr-20 py-4 text-lg rounded-2xl bg-white/60 backdrop-blur-xl border border-white/20 focus:border-primary/50 transition-all font-body font-bold text-text placeholder:text-text/30 shadow-inner"
+              className="w-full pl-6 pr-20 py-4 text-lg rounded-2xl bg-white/60 backdrop-blur-xl border border-white/20 focus:border-[#00704A]/50 transition-all font-body font-bold text-text placeholder:text-text/30 shadow-inner"
             />
             <button
               type="submit"
               disabled={loading || !name}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-14 h-14 rounded-2xl bg-cta text-white flex items-center justify-center hover:bg-cta/80 transition-all active:scale-95 shadow-lg shadow-cta/30 cursor-pointer"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-14 h-14 rounded-2xl bg-[#6F4E37] text-white flex items-center justify-center hover:bg-[#6F4E37]/90 transition-all active:scale-95 shadow-lg shadow-[#6F4E37]/30 cursor-pointer"
             >
               {loading ? <RefreshCw className="w-6 h-6 animate-spin" /> : <ArrowRight className="w-6 h-6" />}
             </button>
@@ -149,9 +166,9 @@ function StarbuckdContent() {
                   <div className="relative z-10 mx-auto w-[85%] h-4 bg-white/90 rounded-sm shadow-sm" />
 
                   {/* Cup Body */}
-                  <div className="relative mx-auto w-full min-h-[24rem] bg-white/70 backdrop-blur-xl rounded-b-[4rem] shadow-2xl shadow-primary/10 border-2 border-white/20 cup-taper flex flex-col items-center pt-8 pb-32 px-8 overflow-hidden">
-                    <div className="w-16 h-16 rounded-full border-4 border-primary/20 flex items-center justify-center mb-6 bg-primary/5">
-                      <Coffee className="w-8 h-8 text-primary/40" />
+                  <div className="relative mx-auto w-full min-h-[24rem] bg-white/70 backdrop-blur-xl rounded-b-[4rem] shadow-2xl shadow-[#00704A]/10 border-2 border-white/20 cup-taper flex flex-col items-center pt-8 pb-32 px-8 overflow-hidden">
+                    <div className="w-16 h-16 rounded-full border-4 border-[#00704A]/20 flex items-center justify-center mb-6 bg-[#00704A]/5">
+                      <Coffee className="w-8 h-8 text-[#00704A]/40" />
                     </div>
 
                     <div className="text-center w-full transform -rotate-1 select-none flex-1 flex flex-col items-center justify-center relative py-4">
@@ -162,7 +179,7 @@ function StarbuckdContent() {
                     </div>
 
                     {/* Sleeve */}
-                    <div className="absolute inset-x-0 bottom-0 h-36 bg-primary shadow-inner flex flex-col items-center justify-center border-t-2 border-primary">
+                    <div className="absolute inset-x-0 bottom-0 h-36 bg-[#6F4E37] shadow-inner flex flex-col items-center justify-center border-t-2 border-[#6F4E37]">
                       <div className="px-5 py-3 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20">
                         <div className="text-[9px] font-black text-white/70 uppercase tracking-[0.2em] mb-1">Barista Difficulty</div>
                         <div className="text-3xl font-black text-white">{prediction.struggleRating}/10</div>
@@ -179,10 +196,10 @@ function StarbuckdContent() {
                   initial={{ x: 20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="flex-1 p-8 rounded-[2.5rem] bg-white/60 backdrop-blur-xl border-2 border-white/20 flex flex-col justify-center shadow-lg shadow-primary/10"
+                  className="flex-1 p-8 rounded-[2.5rem] bg-white/60 backdrop-blur-xl border-2 border-white/20 flex flex-col justify-center shadow-lg shadow-[#00704A]/10"
                 >
-                  <div className="flex items-center gap-4 mb-6 text-primary">
-                    <div className="p-4 rounded-2xl bg-primary/10">
+                  <div className="flex items-center gap-4 mb-6 text-[#00704A]">
+                    <div className="p-4 rounded-2xl bg-[#00704A]/10">
                       <Quote className="w-6 h-6 fill-current" />
                     </div>
                     <h3 className="text-xs font-black uppercase tracking-[0.3em] text-text/40">Why Starbuckd</h3>
@@ -197,7 +214,7 @@ function StarbuckdContent() {
                   initial={{ x: 20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="p-8 rounded-[2.5rem] bg-primary text-white shadow-2xl shadow-primary/30 flex flex-col justify-center items-center py-10 relative overflow-hidden"
+                  className="p-8 rounded-[2.5rem] bg-[#6F4E37] text-white shadow-2xl shadow-[#6F4E37]/20 flex flex-col justify-center items-center py-10 relative overflow-hidden"
                 >
                   <div className="absolute -top-1/4 -right-1/4 w-1/2 h-full bg-white/10 blur-[80px] rounded-full rotate-12" />
 
@@ -212,7 +229,7 @@ function StarbuckdContent() {
                         {prediction.safeAlias}
                       </div>
                       <p className="text-sm font-medium opacity-80 max-w-xs mx-auto leading-relaxed">
-                        Use this one next time to avoid the silent judgment and spelling lessons.
+                        Your new Starbucks identity, because some battles aren&apos;t worth fighting before coffee.
                       </p>
                     </div>
 
@@ -246,7 +263,7 @@ function StarbuckdContent() {
           >
             <div className="flex items-center justify-between mb-8 px-2">
               <h3 className="text-xs font-black uppercase tracking-[0.3em] text-text/40">Order Queue</h3>
-              <button onClick={() => { setHistory([]); localStorage.removeItem("starbuckd_history"); }} className="text-[10px] font-black text-text/30 hover:text-cta transition-colors uppercase flex items-center gap-2 cursor-pointer">
+              <button onClick={() => { setHistory([]); localStorage.removeItem("starbuckd_history"); }} className="text-[10px] font-black text-text/30 hover:text-[#00704A] transition-colors uppercase flex items-center gap-2 cursor-pointer">
                 <Trash2 className="w-3.5 h-3.5" />
                 Clear Queue
               </button>
@@ -255,8 +272,8 @@ function StarbuckdContent() {
               {history.map((h, i) => (
                 <button
                   key={i}
-                  onClick={() => handleButcher(h.name)}
-                  className="px-4 py-3 rounded-2xl bg-white/60 backdrop-blur-xl border-2 border-white/20 text-sm font-bold text-text/60 hover:border-primary/50 hover:text-primary transition-all text-center truncate shadow-md hover:shadow-lg active:scale-95 cursor-pointer"
+                  onClick={() => handleUpdateUrl(h.name)}
+                  className="px-4 py-3 rounded-2xl bg-white/60 backdrop-blur-xl border-2 border-white/20 text-sm font-bold text-text/60 hover:border-[#6F4E37]/50 hover:text-[#6F4E37] transition-all text-center truncate shadow-md hover:shadow-lg active:scale-95 cursor-pointer"
                 >
                   {h.name}
                 </button>

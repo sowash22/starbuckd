@@ -10,11 +10,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: '#ECFEFF',
-        text: '#164E63',
-        primary: '#0891B2',
-        secondary: '#22D3EE',
-        cta: '#22C55E',
+        background: '#1E3932', // Starbucks House Green (Deep Dark Green)
+        text: '#FFFFFF',
+        primary: '#00704A',   // Starbucks Primary Green
+        secondary: '#D4E9E2', // Starbucks Light Accent Green
+        cta: '#C2A64D',       // Starbucks Warm Gold/Coffee Accent
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
