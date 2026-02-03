@@ -140,7 +140,7 @@ function StarbuckdContent() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="What's your name?"
-              className="w-full pl-6 pr-20 py-4 text-lg rounded-2xl bg-white/60 backdrop-blur-xl border border-white/20 focus:border-[#00704A]/50 transition-all font-body font-bold text-text placeholder:text-text/30 shadow-inner"
+              className="w-full pl-6 pr-20 py-4 text-lg rounded-2xl bg-white/60 backdrop-blur-xl border border-white/20 focus:border-[#00704A] focus:ring-4 focus:ring-[#00704A]/20 focus:outline-none transition-all font-body font-bold text-text placeholder:text-text/30 shadow-inner"
             />
             <button
               type="submit"
