@@ -15,7 +15,7 @@ export default function NotFound() {
             The page you&apos;re looking for doesn&apos;t exist or has been moved.
           </p>
         </div>
-        
+
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/"
@@ -36,12 +36,7 @@ export default function NotFound() {
               />
             </svg>
           </Link>
-          <Link
-            href="/writings"
-            className="inline-flex items-center justify-center px-6 py-3.5 text-base font-semibold text-neutral-900 dark:text-neutral-100 border-2 border-neutral-900 dark:border-neutral-100 rounded-full hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900 transition-all duration-200"
-          >
-            Read Writings
-          </Link>
+
         </div>
       </div>
     </div>

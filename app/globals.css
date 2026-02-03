@@ -18,8 +18,64 @@
   }
 
   body {
-    @apply antialiased;
+    @apply antialiased bg-white dark:bg-neutral-950;
+    background-image: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 100% 0%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+    background-attachment: fixed;
   }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/70 dark:bg-neutral-900/70 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-xl;
+  }
+
+  .paper-texture {
+    background-color: #fdfdfd;
+    background-image: url("https://www.transparenttextures.com/patterns/gray-paper.png");
+    box-shadow: inset -10px 0 20px rgba(0, 0, 0, 0.02), inset 10px 0 20px rgba(0, 0, 0, 0.02);
+  }
+
+  .dark .paper-texture {
+    background-color: #1a1a1a;
+    background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre.png");
+    box-shadow: inset -10px 0 30px rgba(0, 0, 0, 0.3), inset 10px 0 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .cup-taper {
+    clip-path: polygon(5% 0%, 95% 0%, 85% 100%, 15% 100%);
+  }
+
+  .font-marker {
+    font-family: var(--font-marker), cursive;
+    filter: url(#marker-ink);
+  }
+
+  .marker-box {
+    @apply border border-neutral-300 dark:border-neutral-700 w-5 h-5 flex items-center justify-center text-[10px] font-marker;
+  }
+}
+
+/* Custom Animations */
+@keyframes steam {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+
+  50% {
+    transform: translateY(-20px) scale(1.1);
+    opacity: 0.4;
+  }
+
+  100% {
+    transform: translateY(-40px) scale(1.2);
+    opacity: 0;
+  }
+}
+
+.animate-steam {
+  animation: steam 3s ease-out infinite;
 }
 
 /* Custom Animations */
@@ -28,6 +84,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
