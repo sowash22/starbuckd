@@ -45,9 +45,12 @@ function StarbuckdContent() {
         body: JSON.stringify({ name: targetName }),
       });
 
-      if (!res.ok) throw new Error("Failed to get prediction");
-
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to get prediction");
+      }
+
       setPrediction(data);
 
       setHistory(prev => {
@@ -55,8 +58,8 @@ function StarbuckdContent() {
         localStorage.setItem("starbuckd_history", JSON.stringify(newHistory));
         return newHistory;
       });
-    } catch (err) {
-      setError("The barista is confused. Try shouting again?");
+    } catch (err: any) {
+      setError(err.message || "The barista is confused. Try shouting again?");
       console.error(err);
     } finally {
       setLoading(false);
@@ -148,6 +151,29 @@ function StarbuckdContent() {
             </button>
           </form>
         </div>
+
+        {/* Error Message */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="max-w-sm mx-auto w-full px-6 py-4 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center gap-4 text-red-200"
+            >
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-bold leading-tight">{error}</p>
+                <button
+                  onClick={() => name && handleUpdateUrl(name)}
+                  className="text-[10px] font-black uppercase tracking-widest mt-1 hover:underline underline-offset-4 cursor-pointer"
+                >
+                  Try Again
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
 
         <AnimatePresence mode="wait">
