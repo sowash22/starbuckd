@@ -130,9 +130,14 @@ function StarbuckdContent() {
           Starbuck<span className="text-[#6F4E37] ml-[-7px]">&apos;d</span>
           {/* Starbuck<span className="text-[#6F4E37] ml-[-7px]">d</span> */}
         </h1>
-        <p className="text-center text-sm md:text-base font-bold text-text/60 uppercase tracking-wide max-w-sm mx-auto">
-          Spelled it right, they got it wrong. <br /> Find your <span className="text-[#00704A]">barista-safe alias</span>.
-        </p>
+        <div className="text-center space-y-3 max-w-sm mx-auto">
+          <p className="text-sm md:text-base font-black text-text/80 uppercase tracking-tight">
+            Tired of baristas butchering your name?
+          </p>
+          <p className="text-xs sm:text-sm font-medium text-text/40 leading-relaxed uppercase tracking-wider">
+            Save the struggle. Find your <span className="text-[#00704A]">safe alias</span>.
+          </p>
+        </div>
 
         <div className="relative max-w-sm mx-auto w-full pt-4">
           <form onSubmit={handleSubmit} className="relative">
