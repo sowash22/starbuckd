@@ -78,6 +78,10 @@ function StarbuckdContent() {
       handleUpdateUrl(name.trim());
     }
   };
+  const handleHomeClick = () => {
+    router.push('/', { scroll: false });
+    setName("");
+  };
 
   useEffect(() => {
     const savedHistory = localStorage.getItem("starbuckd_history");
@@ -118,22 +122,70 @@ function StarbuckdContent() {
         className="w-full max-w-5xl mx-auto space-y-12"
       >
         {/* Header Section */}
-        {/* <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black uppercase tracking-[0.2em] text-primary"
+        <div className="flex justify-center">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00704A]/10 border border-[#00704A]/20 text-[10px] font-black uppercase tracking-[0.2em] text-[#00704A]"
+          >
+            <Coffee className="w-3.5 h-3.5" />
+            <span>Identity Crisis Simulator</span>
+          </motion.div>
+        </div>
+        <h1
+          onClick={handleHomeClick}
+          className="text-4xl sm:text-6xl md:text-8xl font-sans font-black tracking-tighter text-text leading-none uppercase text-center flex items-center justify-center gap-3 sm:gap-4 cursor-pointer select-none"
         >
-          <Coffee className="w-3.5 h-3.5" />
-          <span>Identity Crisis Simulator</span>
-        </motion.div> */}
-        <h1 className="text-4xl sm:text-6xl md:text-8xl font-sans font-black tracking-tighter text-text leading-none uppercase text-center flex items-center justify-center gap-3 sm:gap-4">
           <Coffee className="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 text-[#00704A] flex-shrink-0" />
           Starbuck<span className="text-[#6F4E37] ml-[-7px]">&apos;d</span>
           {/* Starbuck<span className="text-[#6F4E37] ml-[-7px]">d</span> */}
         </h1>
-        <p className="text-[10px] sm:text-xs font-bold text-text/40 text-center mt-2 uppercase tracking-[0.3em] max-w-xs sm:max-w-md mx-auto leading-relaxed">
-          Grande Misunderstanding? <br className="sm:hidden" /> Find your safe alias to avoid the struggle.
+        <p className="text-sm md:text-base font-bold text-text/60 text-center mt-2 uppercase tracking-[0.2em] max-w-2xl mx-auto">
+          The ultimate Identity Crisis Simulator for the phonetically challenged.
         </p>
+
+        {/* Explainer Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto pt-4">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="flex flex-col items-center text-center space-y-3 p-4 rounded-3xl bg-white/5 border border-white/10"
+          >
+            <div className="p-3 rounded-2xl bg-[#00704A]/20 text-[#00704A]">
+              <UserCheck className="w-6 h-6" />
+            </div>
+            <h3 className="text-xs font-black uppercase tracking-widest text-text">1. Enter Name</h3>
+            <p className="text-[10px] text-text/40 leading-relaxed">Tell us your name (or what you usually yell over the espresso machine).</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex flex-col items-center text-center space-y-3 p-4 rounded-3xl bg-white/5 border border-white/10"
+          >
+            <div className="p-3 rounded-2xl bg-[#6F4E37]/20 text-[#6F4E37]">
+              <RefreshCw className="w-6 h-6" />
+            </div>
+            <h3 className="text-xs font-black uppercase tracking-widest text-text">2. Barista Logic</h3>
+            <p className="text-[10px] text-text/40 leading-relaxed">Our AI simulates a barista brain to create the most hilariously wrong spelling.</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col items-center text-center space-y-3 p-4 rounded-3xl bg-white/5 border border-white/10"
+          >
+            <div className="p-3 rounded-2xl bg-[#00704A]/20 text-[#00704A]">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <h3 className="text-xs font-black uppercase tracking-widest text-text">3. Get Alias</h3>
+            <p className="text-[10px] text-text/40 leading-relaxed">Discover a &quot;Safe Alias&quot; that protects you from future spelling lessons.</p>
+          </motion.div>
+        </div>
+
         <div className="relative max-w-sm mx-auto w-full pt-4">
           <form onSubmit={handleSubmit} className="relative">
             <input
