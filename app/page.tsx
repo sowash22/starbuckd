@@ -128,7 +128,8 @@ function StarbuckdContent() {
         </motion.div> */}
         <h1 className="text-4xl sm:text-6xl md:text-8xl font-sans font-black tracking-tighter text-text leading-none uppercase text-center flex items-center justify-center gap-3 sm:gap-4">
           <Coffee className="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 text-[#00704A] flex-shrink-0" />
-          Starbuck<span className="text-[#00704A]">&apos;d</span>
+          Starbuck<span className="text-[#6F4E37] ml-[-7px]">&apos;d</span>
+          {/* Starbuck<span className="text-[#6F4E37] ml-[-7px]">d</span> */}
         </h1>
         <p className="text-[10px] sm:text-xs font-bold text-text/40 text-center mt-2 uppercase tracking-[0.3em] max-w-xs sm:max-w-md mx-auto leading-relaxed">
           Grande Misunderstanding? <br className="sm:hidden" /> Find your safe alias to avoid the struggle.
