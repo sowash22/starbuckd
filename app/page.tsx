@@ -121,17 +121,7 @@ function StarbuckdContent() {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-5xl mx-auto space-y-12"
       >
-        {/* Header Section */}
-        <div className="flex justify-center">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00704A]/10 border border-[#00704A]/20 text-[10px] font-black uppercase tracking-[0.2em] text-[#00704A]"
-          >
-            <Coffee className="w-3.5 h-3.5" />
-            <span>Stop the barista struggle</span>
-          </motion.div>
-        </div>
+
         <h1
           onClick={handleHomeClick}
           className="text-4xl sm:text-6xl md:text-8xl font-sans font-black tracking-tighter text-text leading-none uppercase text-center flex items-center justify-center gap-3 sm:gap-4 cursor-pointer select-none"
@@ -140,16 +130,9 @@ function StarbuckdContent() {
           Starbuck<span className="text-[#6F4E37] ml-[-7px]">&apos;d</span>
           {/* Starbuck<span className="text-[#6F4E37] ml-[-7px]">d</span> */}
         </h1>
-        <div className="text-center space-y-4 max-w-2xl mx-auto">
-          <p className="text-xl md:text-2xl font-black text-text leading-tight">
-            Tired of baristas butchering your name?
-          </p>
-          <p className="text-sm md:text-base font-medium text-text/60 leading-relaxed">
-            How many times have you spelled your name perfectly, only to get a cup that says something totally random?
-            <br className="hidden md:block" />
-            <span className="text-[#6F4E37] font-bold">Save the struggle.</span> Enter your name to see the &quot;butchered&quot; version and find your perfect <span className="text-[#00704A] font-bold">Safe Alias</span>.
-          </p>
-        </div>
+        <p className="text-center text-sm md:text-base font-bold text-text/60 uppercase tracking-wide max-w-sm mx-auto">
+          Spelled it right, they got it wrong. <br /> Find your <span className="text-[#00704A]">barista-safe alias</span>.
+        </p>
 
         <div className="relative max-w-sm mx-auto w-full pt-4">
           <form onSubmit={handleSubmit} className="relative">
