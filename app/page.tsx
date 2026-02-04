@@ -119,19 +119,19 @@ function StarbuckdContent() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-5xl mx-auto space-y-8"
+        className="w-full max-w-5xl mx-auto space-y-12"
       >
 
         <h1
           onClick={handleHomeClick}
-          className="text-3xl sm:text-5xl md:text-6xl font-sans font-black tracking-tighter text-text leading-none uppercase text-center flex items-center justify-center gap-2 cursor-pointer select-none"
+          className="text-4xl sm:text-6xl md:text-8xl font-sans font-black tracking-tighter text-text leading-none uppercase text-center flex items-center justify-center gap-3 sm:gap-4 cursor-pointer select-none"
         >
-          <Coffee className="w-8 h-8 sm:w-12 sm:h-12 md:w-14 md:h-14 text-[#00704A] flex-shrink-0" />
-          Starbuck<span className="text-[#6F4E37] ml-[-5px] md:ml-[-7px]">&apos;d</span>
+          <Coffee className="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 text-[#00704A] flex-shrink-0" />
+          Starbuck<span className="text-[#6F4E37] ml-[-7px]">&apos;d</span>
           {/* Starbuck<span className="text-[#6F4E37] ml-[-7px]">d</span> */}
         </h1>
-        <p className="text-center text-xs sm:text-sm md:text-base font-bold text-text/60 max-w-sm mx-auto leading-tight">
-          Because no one&apos;s name is actually &quot;Bria.&quot; <br /> <span className="text-[#00704A]">Find a safe alias</span> and save the struggle.
+        <p className="text-center text-sm md:text-base font-bold text-text/60 uppercase tracking-wide max-w-sm mx-auto">
+          Spelled it right, they got it wrong. <br /> Find your <span className="text-[#00704A]">barista-safe alias</span>.
         </p>
 
         <div className="relative max-w-sm mx-auto w-full pt-4">
