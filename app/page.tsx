@@ -129,7 +129,7 @@ function StarbuckdContent() {
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00704A]/10 border border-[#00704A]/20 text-[10px] font-black uppercase tracking-[0.2em] text-[#00704A]"
           >
             <Coffee className="w-3.5 h-3.5" />
-            <span>A tribute to every butchered cup</span>
+            <span>Stop the barista struggle</span>
           </motion.div>
         </div>
         <h1
@@ -140,12 +140,14 @@ function StarbuckdContent() {
           Starbuck<span className="text-[#6F4E37] ml-[-7px]">&apos;d</span>
           {/* Starbuck<span className="text-[#6F4E37] ml-[-7px]">d</span> */}
         </h1>
-        <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <p className="text-base md:text-lg font-bold text-text/70 uppercase tracking-[0.1em]">
-            Because life&apos;s too short to explain your spelling before coffee.
+        <div className="text-center space-y-4 max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl font-black text-text leading-tight">
+            Tired of baristas butchering your name?
           </p>
-          <p className="text-xs sm:text-sm font-medium text-text/40 leading-relaxed">
-            Discover your barista-assigned alter-ego and find a <span className="text-[#00704A] font-bold">&quot;Safe Alias&quot;</span> for a struggle-free morning.
+          <p className="text-sm md:text-base font-medium text-text/60 leading-relaxed">
+            How many times have you spelled your name perfectly, only to get a cup that says something totally random?
+            <br className="hidden md:block" />
+            <span className="text-[#6F4E37] font-bold">Save the struggle.</span> Enter your name to see the &quot;butchered&quot; version and find your perfect <span className="text-[#00704A] font-bold">Safe Alias</span>.
           </p>
         </div>
 
