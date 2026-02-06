@@ -1,6 +1,6 @@
 # Starbuckd ☕️
 
-**Starbuckd** is a hilarious identity crisis simulator that predicts how an English-speaking barista will inevitably butcher your name on a coffee cup.
+**Starbuckd** predicts how an English-speaking barista will inevitably butcher your name on a coffee cup and provide a safe alias
 
 ## Features
 
