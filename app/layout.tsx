@@ -1,4 +1,5 @@
 import { Lora, Raleway, Permanent_Marker } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css'
 import { Metadata } from 'next'
 
@@ -40,6 +41,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <main className="flex-1">{children}</main>
+        <Analytics />
       </body>
     </html>
   )
