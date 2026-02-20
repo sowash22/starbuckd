@@ -73,7 +73,7 @@ function AnimNum({ to }: { to: number }) {
 // ─── Cup illustration ─────────────────────────────────────────────────────────
 function Cup({ starbuckdName }: { starbuckdName: string }) {
   return (
-    <svg viewBox="0 0 160 240" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", maxWidth: 200, filter: "drop-shadow(0 24px 40px rgba(0,0,0,0.18))" }}>
+    <svg viewBox="0 0 160 240" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", maxWidth: 200, margin: "0 auto", display: "block", filter: "drop-shadow(0 24px 40px rgba(0,0,0,0.18))" }}>
       <defs>
         <linearGradient id="cg1" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#EDE8E0" />
@@ -332,8 +332,7 @@ function App() {
           position: fixed; inset: 0; pointer-events: none;
           background:
             radial-gradient(ellipse 60% 50% at 85% 10%, rgba(0,112,74,0.08) 0%, transparent 70%),
-            radial-gradient(ellipse 50% 40% at 10% 90%, rgba(111,78,55,0.07) 0%, transparent 70%),
-            radial-gradient(ellipse 40% 30% at 50% 50%, rgba(255,255,255,0.6) 0%, transparent 70%);
+            radial-gradient(ellipse 50% 40% at 10% 90%, rgba(111,78,55,0.07) 0%, transparent 70%);
         }
 
         .wrap {
@@ -356,17 +355,18 @@ function App() {
         .logo-text {
           font-family: 'Playfair Display', Georgia, serif;
           font-size: clamp(52px, 14vw, 76px);
-          font-weight: 900;
-          color: ${B};
-          line-height: 0.9;
-          letter-spacing: -3px;
+          font-weight: 700;
+          color: #E9DED2;
+          line-height: 0.96;
+          letter-spacing: -1.2px;
+          text-shadow: 0 1px 8px rgba(0, 0, 0, 0.18);
         }
         .logo-accent { color: ${G}; }
         .logo-sub {
           margin-top: 10px;
           font-size: 13px;
-          font-weight: 500;
-          color: #A89E94;
+          font-weight: 600;
+          color: #C9C0B7;
           letter-spacing: 0.02em;
         }
 
@@ -584,7 +584,7 @@ function App() {
               {/* <Coffee className="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 text-[#00704A] flex-shrink-0" /> */}
               Starbuck<span className="text-[#6F4E37] ml-[-7px]">&apos;d</span>
             </div>
-            <p className="logo-sub">See how the barista hears your name</p>
+            <p className="logo-sub">See how barists will butcher your name and find a coffee safe alias</p>
           </motion.div>
 
           {/* Input */}
@@ -628,7 +628,7 @@ function App() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.35 }}
-                style={{ textAlign: "center", padding: "40px 0" }}
+                style={{ textAlign: "center", padding: "40px 0", display: "flex", flexDirection: "column", alignItems: "center" }}
               >
                 <Steam active={true} />
                 <div className="float" style={{ display: "inline-block" }}>
@@ -714,7 +714,7 @@ function App() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ delay: 0.3 }}
-                style={{ textAlign: "center", padding: "32px 0 12px" }}
+                style={{ textAlign: "center", padding: "32px 0 12px", display: "flex", flexDirection: "column", alignItems: "center" }}
               >
                 <Steam active={false} />
                 <div style={{ opacity: 0.35 }}>
