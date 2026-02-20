@@ -1,331 +1,753 @@
 "use client";
 
-import { useState, useEffect, Suspense, useCallback, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Coffee, RefreshCw, AlertCircle, Quote, ArrowRight, History, Trash2, CheckCircle2, UserCheck, ShieldCheck } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { useState, useEffect, useCallback, useRef, Suspense, ReactNode, CSSProperties, FormEvent, MouseEvent } from "react";
+import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
+import { RefreshCw, ArrowUp, RotateCcw } from "lucide-react";
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+// ─── Theme ───────────────────────────────────────────────────────────────────
+const G = "#00704A";
+const B = "#1E3932";
+const BROWN = "#6F4E37";
+const CREAM = "#F2EFE9";
+
+// ─── Utility ─────────────────────────────────────────────────────────────────
+const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi);
+
+// ─── Tilt Card wrapper ────────────────────────────────────────────────────────
+interface TiltCardProps {
+  children: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+  delay?: number;
 }
 
+function TiltCard({ children, className, style, delay = 0 }: TiltCardProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const rx = useMotionValue(0);
+  const ry = useMotionValue(0);
+  const srx = useSpring(rx, { stiffness: 200, damping: 30 });
+  const sry = useSpring(ry, { stiffness: 200, damping: 30 });
+
+  const onMove = (e: MouseEvent) => {
+    const el = ref.current;
+    if (!el) return;
+    const { left, top, width, height } = el.getBoundingClientRect();
+    const x = (e.clientX - left) / width - 0.5;
+    const y = (e.clientY - top) / height - 0.5;
+    rx.set(y * -10);
+    ry.set(x * 10);
+  };
+  const onLeave = () => { rx.set(0); ry.set(0); };
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
+      style={{ rotateX: srx, rotateY: sry, transformStyle: "preserve-3d", perspective: 800, ...style }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// ─── Animated number ──────────────────────────────────────────────────────────
+function AnimNum({ to }: { to: number }) {
+  const [cur, setCur] = useState(0);
+  useEffect(() => {
+    let start = 0;
+    const step = () => {
+      start += 0.4;
+      setCur(Math.min(Math.round(start * 10) / 10, to));
+      if (start < to) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [to]);
+  return <>{cur}</>;
+}
+
+// ─── Cup illustration ─────────────────────────────────────────────────────────
+function Cup({ starbuckdName }: { starbuckdName: string }) {
+  return (
+    <svg viewBox="0 0 160 240" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", maxWidth: 200, filter: "drop-shadow(0 24px 40px rgba(0,0,0,0.18))" }}>
+      <defs>
+        <linearGradient id="cg1" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#EDE8E0" />
+          <stop offset="50%" stopColor="#FFFFFF" />
+          <stop offset="100%" stopColor="#D8D0C4" />
+        </linearGradient>
+        <linearGradient id="sg1" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#4A3828" />
+          <stop offset="50%" stopColor={BROWN} />
+          <stop offset="100%" stopColor="#3A2A1A" />
+        </linearGradient>
+        <linearGradient id="lid1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#CEC6BC" />
+          <stop offset="100%" stopColor="#B8B0A4" />
+        </linearGradient>
+        <clipPath id="cup-clip">
+          <path d="M22 28 L138 28 L126 220 Q120 232 80 232 Q40 232 34 220 Z" />
+        </clipPath>
+      </defs>
+
+      {/* Lid */}
+      <ellipse cx="80" cy="22" rx="62" ry="10" fill="url(#lid1)" />
+      <path d="M18 22 Q18 10 28 8 L132 8 Q142 10 142 22" stroke="#A8A09A" strokeWidth="1.5" fill="url(#lid1)" />
+      {/* Sip hole */}
+      <rect x="60" y="6" width="40" height="9" rx="4.5" fill="#AAA29A" />
+      <rect x="64" y="8" width="32" height="5" rx="2.5" fill="#B8B0A8" />
+
+      {/* Cup body */}
+      <path d="M22 28 L138 28 L126 220 Q120 232 80 232 Q40 232 34 220 Z" fill="url(#cg1)" />
+
+      {/* Sleeve */}
+      <path d="M28 128 L34 220 Q40 232 80 232 Q120 232 126 220 L132 128 Z" fill="url(#sg1)" clipPath="url(#cup-clip)" />
+
+      {/* Green logo dot */}
+      <circle cx="80" cy="182" r="24" fill={G} opacity="0.92" />
+      <text x="80" y="188" textAnchor="middle" fontSize="16" fill="white" fontFamily="serif">✦</text>
+
+      {/* Highlight */}
+      <path d="M38 32 L48 28 L52 180 L40 175 Z" fill="white" opacity="0.14" clipPath="url(#cup-clip)" />
+
+      {/* Name text */}
+      <foreignObject x="28" y="36" width="104" height="82">
+        <div
+          style={{
+            width: "100%", height: "100%", display: "flex",
+            alignItems: "center", justifyContent: "center",
+            padding: "6px", textAlign: "center",
+          }}>
+          <span style={{
+            fontFamily: "'Caveat', 'Permanent Marker', cursive",
+            fontSize: starbuckdName?.length > 7 ? 18 : starbuckdName?.length > 5 ? 22 : 26,
+            color: "#2C1A0E",
+            lineHeight: 1.15,
+            fontWeight: 700,
+            wordBreak: "break-word",
+            transform: "rotate(-2deg)",
+            display: "block",
+          }}>
+            {starbuckdName}
+          </span>
+        </div>
+      </foreignObject>
+    </svg>
+  );
+}
+
+// ─── Steam ────────────────────────────────────────────────────────────────────
+function Steam({ active }: { active: boolean }) {
+  if (!active) return null;
+  return (
+    <div style={{ display: "flex", gap: 10, justifyContent: "center", height: 36, alignItems: "flex-end", marginBottom: 4 }}>
+      {[0, 1, 2].map(i => (
+        <motion.div key={i}
+          animate={{ y: [0, -20, 0], opacity: [0.3, 0.7, 0.3], scaleX: [1, 1.4, 1] }}
+          transition={{ duration: 2.2, delay: i * 0.6, repeat: Infinity, ease: "easeInOut" }}
+          style={{ width: 3, height: 28, borderRadius: 4, background: `linear-gradient(to top, ${BROWN}50, transparent)` }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ─── Pill tag ─────────────────────────────────────────────────────────────────
+function Tag({ children, color = G }: { children: ReactNode; color?: string }) {
+  return (
+    <span style={{
+      display: "inline-flex", alignItems: "center", gap: 5,
+      padding: "3px 10px", borderRadius: 99,
+      fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase",
+      background: color + "18", color: color, border: `1px solid ${color}30`,
+    }}>{children}</span>
+  );
+}
+
+// ─── Difficulty meter ─────────────────────────────────────────────────────────
+function DifficultyMeter({ rating }: { rating: number }) {
+  const color = rating >= 8 ? "#E53935" : rating >= 5 ? BROWN : G;
+  const label = rating >= 8 ? "Brutal" : rating >= 6 ? "Rough" : rating >= 4 ? "Meh" : "Easy";
+  return (
+    <div style={{ width: "100%" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "#9B8E85", letterSpacing: "0.08em", textTransform: "uppercase" }}>Barista difficulty</span>
+        <span style={{ fontSize: 13, fontWeight: 800, color }}>
+          <AnimNum to={Number(rating)} />
+          <span style={{ fontSize: 10, opacity: 0.6 }}>/10 — {label}</span>
+        </span>
+      </div>
+      <div style={{ height: 5, background: "#E8E2DA", borderRadius: 99, overflow: "hidden" }}>
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${(rating / 10) * 100}%` }}
+          transition={{ delay: 0.3, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          style={{ height: "100%", background: `linear-gradient(to right, ${color}90, ${color})`, borderRadius: 99 }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ─── History strip ────────────────────────────────────────────────────────────
+interface HistoryItem {
+  name: string;
+  date: string;
+}
+
+interface HistoryStripProps {
+  history: HistoryItem[];
+  onSelect: (name: string) => void;
+  onClear: () => void;
+}
+
+function HistoryStrip({ history, onSelect, onClear }: HistoryStripProps) {
+  if (!history.length) return null;
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+      style={{ position: "relative" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: "#B0A89E", letterSpacing: "0.1em", textTransform: "uppercase" }}>Recent</span>
+        <button onClick={onClear} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 10, fontWeight: 700, color: "#C0B8B0", textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "inherit" }}>
+          Clear
+        </button>
+      </div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {history.map((h, i) => (
+          <motion.button key={i}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => onSelect(h.name)}
+            style={{
+              padding: "7px 16px", borderRadius: 99,
+              background: "white", border: "1.5px solid #E4DDD5",
+              fontSize: 13, fontWeight: 600, color: BROWN,
+              cursor: "pointer", fontFamily: "inherit",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+              transition: "border-color 0.15s",
+            }}
+            onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => e.currentTarget.style.borderColor = G}
+            onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => e.currentTarget.style.borderColor = "#E4DDD5"}
+          >
+            {h.name}
+          </motion.button>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
 interface Prediction {
   starbuckdName: string;
+  struggleRating: number | string;
   rationale: string;
   safeAlias: string;
-  struggleRating: string | number;
-  provider?: string;
 }
 
-function StarbuckdContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const [name, setName] = useState("");
+function App() {
+  const [stage, setStage] = useState<"idle" | "loading" | "result">("idle");
+  const [inputVal, setInputVal] = useState("");
+  const [submittedName, setSubmittedName] = useState("");
   const [prediction, setPrediction] = useState<Prediction | null>(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [history, setHistory] = useState<{ name: string, date: string }[]>([]);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const lastFetchedName = useRef<string | null>(null);
+  useEffect(() => {
+    try { const s = localStorage.getItem("sbhist"); if (s) setHistory(JSON.parse(s)); } catch { }
+    inputRef.current?.focus();
+  }, []);
 
-  const performPrediction = useCallback(async (targetName: string) => {
-    if (!targetName.trim()) return;
-
-    setLoading(true);
+  const predict = useCallback(async (name: string) => {
+    if (!name.trim()) return;
+    setStage("loading");
     setError("");
     setPrediction(null);
+    setSubmittedName(name);
 
     try {
       const res = await fetch("/api/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: targetName }),
+        body: JSON.stringify({ name }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to get prediction");
-      }
-
+      if (!res.ok) throw new Error(data.error || "Failed");
       setPrediction(data);
-
+      setStage("result");
       setHistory(prev => {
-        const newHistory = [{ name: targetName, date: new Date().toISOString() }, ...prev.filter(h => h.name !== targetName)].slice(0, 10);
-        localStorage.setItem("starbuckd_history", JSON.stringify(newHistory));
-        return newHistory;
+        const next = [{ name, date: new Date().toISOString() }, ...prev.filter(h => h.name !== name)].slice(0, 8);
+        localStorage.setItem("sbhist", JSON.stringify(next));
+        return next;
       });
     } catch (err: any) {
-      setError(err.message || "The barista is confused. Try shouting again?");
-      console.error(err);
-    } finally {
-      setLoading(false);
+      setError(err.message || "Something went wrong");
+      setStage("idle");
     }
   }, []);
 
-  const handleUpdateUrl = useCallback((targetName: string) => {
-    const params = new URLSearchParams(window.location.search);
-    params.set("name", targetName);
-    router.push(`?${params.toString()}`, { scroll: false });
-  }, [router]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (name.trim()) {
-      handleUpdateUrl(name.trim());
-    }
-  };
-  const handleHomeClick = () => {
-    router.push('/', { scroll: false });
-    setName("");
+  const submit = (e?: FormEvent) => {
+    e?.preventDefault();
+    if (inputVal.trim()) predict(inputVal.trim());
   };
 
-  useEffect(() => {
-    const savedHistory = localStorage.getItem("starbuckd_history");
-    if (savedHistory) setHistory(JSON.parse(savedHistory));
-  }, []);
-
-  useEffect(() => {
-    const nameParam = searchParams.get("name");
-    if (nameParam && nameParam !== lastFetchedName.current) {
-      lastFetchedName.current = nameParam;
-      setName(nameParam);
-      performPrediction(nameParam);
-    } else if (!nameParam) {
-      lastFetchedName.current = null;
-      setPrediction(null);
-    }
-  }, [searchParams, performPrediction]);
+  const reset = () => {
+    setStage("idle");
+    setPrediction(null);
+    setInputVal("");
+    setError("");
+    setTimeout(() => inputRef.current?.focus(), 50);
+  };
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center pt-24 pb-12 px-4 overflow-hidden bg-background font-body">
-      {/* SVG Ink Bleed Filter */}
-      <svg className="absolute w-0 h-0 pointer-events-none">
-        <filter id="marker-ink">
-          <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" result="noise" />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" />
-        </filter>
-      </svg>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,900&family=Caveat:wght@700&family=Inter:wght@400;500;600;700&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body {
+          background: ${CREAM};
+          font-family: 'Inter', sans-serif;
+          -webkit-font-smoothing: antialiased;
+          min-height: 100vh;
+        }
+        ::selection { background: ${G}30; }
 
-      {/* Background Decorations */}
-      <div className="fixed inset-0 pointer-events-none -z-10">
-        <div className="absolute -top-20 -right-20 w-96 h-96 bg-white/10 blur-[120px] rounded-full" />
-        <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-white/10 blur-[120px] rounded-full" />
-      </div>
+        .root {
+          min-height: 100vh;
+          display: grid;
+          place-items: center;
+          padding: 32px 20px;
+          position: relative;
+          overflow: hidden;
+        }
+        /* Background blobs */
+        .root::before {
+          content: '';
+          position: fixed; inset: 0; pointer-events: none;
+          background:
+            radial-gradient(ellipse 60% 50% at 85% 10%, rgba(0,112,74,0.08) 0%, transparent 70%),
+            radial-gradient(ellipse 50% 40% at 10% 90%, rgba(111,78,55,0.07) 0%, transparent 70%),
+            radial-gradient(ellipse 40% 30% at 50% 50%, rgba(255,255,255,0.6) 0%, transparent 70%);
+        }
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-5xl mx-auto space-y-12"
-      >
+        .wrap {
+          width: 100%;
+          max-width: 480px;
+          position: relative;
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+        }
 
-        <h1
-          onClick={handleHomeClick}
-          className="text-4xl sm:text-6xl md:text-8xl font-sans font-black tracking-tighter text-text leading-none uppercase text-center flex items-center justify-center gap-3 sm:gap-4 cursor-pointer select-none"
-        >
-          <Coffee className="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 text-[#00704A] flex-shrink-0" />
-          Starbuck<span className="text-[#6F4E37] ml-[-7px]">&apos;d</span>
-          {/* Starbuck<span className="text-[#6F4E37] ml-[-7px]">d</span> */}
-        </h1>
-        <div className="text-center space-y-3 max-w-sm mx-auto">
-          <p className="text-sm md:text-base font-black text-text/80 uppercase tracking-tight">
-            Tired of baristas butchering your name?
-          </p>
-          <p className="text-xs sm:text-sm font-medium text-text/40 leading-relaxed uppercase tracking-wider">
-            Save the struggle. Find your <span className="text-[#00704A]">safe alias</span>.
-          </p>
-        </div>
+        /* Logo */
+        .logo {
+          text-align: center;
+          margin-bottom: 40px;
+          cursor: pointer;
+          user-select: none;
+        }
+        .logo-text {
+          font-family: 'Playfair Display', Georgia, serif;
+          font-size: clamp(52px, 14vw, 76px);
+          font-weight: 900;
+          color: ${B};
+          line-height: 0.9;
+          letter-spacing: -3px;
+        }
+        .logo-accent { color: ${G}; }
+        .logo-sub {
+          margin-top: 10px;
+          font-size: 13px;
+          font-weight: 500;
+          color: #A89E94;
+          letter-spacing: 0.02em;
+        }
 
-        <div className="relative max-w-sm mx-auto w-full pt-4">
-          <form onSubmit={handleSubmit} className="relative">
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="What's your name?"
-              className="w-full pl-6 pr-20 py-4 text-lg rounded-2xl bg-white/60 backdrop-blur-xl border border-white/20 focus:border-[#00704A] focus:ring-4 focus:ring-[#00704A]/20 focus:outline-none transition-all font-body font-bold text-text placeholder:text-text/30 shadow-inner"
-            />
-            <button
-              type="submit"
-              disabled={loading || !name}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-14 h-14 rounded-2xl bg-[#6F4E37] text-white flex items-center justify-center hover:bg-[#6F4E37]/90 transition-all active:scale-95 shadow-lg shadow-[#6F4E37]/30 cursor-pointer"
-            >
-              {loading ? <RefreshCw className="w-6 h-6 animate-spin" /> : <ArrowRight className="w-6 h-6" />}
-            </button>
-          </form>
-        </div>
+        /* Input area */
+        .input-wrap {
+          position: relative;
+          margin-bottom: 16px;
+        }
+        .main-input {
+          width: 100%;
+          padding: 20px 70px 20px 24px;
+          font-size: 18px;
+          font-weight: 600;
+          font-family: 'Inter', sans-serif;
+          color: ${B};
+          background: white;
+          border: 2px solid transparent;
+          border-radius: 20px;
+          outline: none;
+          box-shadow: 0 2px 20px rgba(0,0,0,0.08), 0 0 0 1px #E4DDD5;
+          transition: box-shadow 0.2s, border-color 0.2s;
+          appearance: none;
+          -webkit-appearance: none;
+        }
+        .main-input::placeholder { color: #C0B8B0; font-weight: 400; }
+        .main-input:focus {
+          border-color: ${G};
+          box-shadow: 0 2px 20px rgba(0,0,0,0.08), 0 0 0 4px rgba(0,112,74,0.12);
+        }
+        .go-btn {
+          position: absolute;
+          right: 10px; top: 50%;
+          transform: translateY(-50%);
+          width: 50px; height: 50px;
+          border-radius: 14px;
+          background: ${G};
+          border: none;
+          cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          color: white;
+          transition: background 0.15s, transform 0.1s;
+          box-shadow: 0 4px 14px rgba(0,112,74,0.35);
+        }
+        .go-btn:hover { background: #005C3B; }
+        .go-btn:active { transform: translateY(-50%) scale(0.92); }
+        .go-btn:disabled { background: #D0C8C0; box-shadow: none; cursor: not-allowed; }
 
-        {/* Error Message */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="max-w-sm mx-auto w-full px-6 py-4 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center gap-4 text-red-200"
-            >
-              <AlertCircle className="w-5 h-5 flex-shrink-0" />
-              <div className="flex-1">
-                <p className="text-sm font-bold leading-tight">{error}</p>
-                <button
-                  onClick={() => name && handleUpdateUrl(name)}
-                  className="text-[10px] font-black uppercase tracking-widest mt-1 hover:underline underline-offset-4 cursor-pointer"
-                >
-                  Try Again
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        /* Error */
+        .error-bar {
+          padding: 12px 18px;
+          background: #FFF2F2;
+          border: 1.5px solid #FFD0D0;
+          border-radius: 14px;
+          color: #C0392B;
+          font-size: 13px;
+          font-weight: 600;
+          margin-bottom: 16px;
+        }
 
+        /* Card base */
+        .card {
+          background: white;
+          border-radius: 24px;
+          border: 1.5px solid rgba(0,0,0,0.06);
+          box-shadow: 0 4px 32px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+          overflow: hidden;
+        }
 
-        <AnimatePresence mode="wait">
-          {prediction && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              className="flex flex-col lg:flex-row items-stretch justify-center gap-8"
-            >
-              {/* Left Column: The Cup */}
-              <div className="w-full lg:w-[400px] flex-shrink-0 flex flex-col items-center justify-center">
-                <div className="relative w-full max-w-sm">
-                  {/* Lid */}
-                  <div className="relative z-20 mx-auto w-[70%] h-10 bg-white/80 rounded-t-[2.5rem] shadow-md border-b-4 border-white" />
-                  <div className="relative z-10 mx-auto w-[85%] h-4 bg-white/90 rounded-sm shadow-sm" />
+        /* Result section */
+        .result-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
 
-                  {/* Cup Body */}
-                  <div className="relative mx-auto w-full min-h-[24rem] bg-white/70 backdrop-blur-xl rounded-b-[4rem] shadow-2xl shadow-[#00704A]/10 border-2 border-white/20 cup-taper flex flex-col items-center pt-8 pb-32 px-8 overflow-hidden">
-                    <div className="w-16 h-16 rounded-full border-4 border-[#00704A]/20 flex items-center justify-center mb-6 bg-[#00704A]/5">
-                      <Coffee className="w-8 h-8 text-[#00704A]/40" />
-                    </div>
+        /* Name reveal card */
+        .name-card {
+          padding: 28px;
+          position: relative;
+        }
+        .names-row {
+          display: flex;
+          align-items: center;
+          gap: 0;
+          margin-bottom: 24px;
+        }
+        .name-block {
+          flex: 1;
+          min-width: 0;
+        }
+        .name-label {
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: #B0A89E;
+          margin-bottom: 4px;
+        }
+        .name-val {
+          font-family: 'Playfair Display', Georgia, serif;
+          font-size: clamp(24px, 6vw, 32px);
+          font-weight: 900;
+          line-height: 1.05;
+          color: ${B};
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .name-val.butchered {
+          color: ${BROWN};
+          font-style: italic;
+        }
+        .arrow-div {
+          padding: 0 16px;
+          font-size: 22px;
+          color: #D0C8C0;
+          flex-shrink: 0;
+        }
 
-                    <div className="text-center w-full transform -rotate-1 select-none flex-1 flex flex-col items-center justify-center relative py-4">
-                      <span className="text-[10px] font-black text-text/40 uppercase tracking-[0.3em] mb-4 border-b border-text/10 w-1/2 pb-1">Customer</span>
-                      <div className="text-5xl md:text-6xl font-marker text-text tracking-tight leading-tight w-full uppercase break-words">
-                        {prediction.starbuckdName}
-                      </div>
-                    </div>
+        /* Alias banner */
+        .alias-banner {
+          background: ${G};
+          border-radius: 20px;
+          padding: 28px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          position: relative;
+          overflow: hidden;
+        }
+        .alias-banner::after {
+          content: '';
+          position: absolute;
+          top: -50%; right: -10%;
+          width: 50%; height: 200%;
+          background: rgba(255,255,255,0.07);
+          border-radius: 50%;
+          pointer-events: none;
+        }
+        .alias-text {
+          font-family: 'Playfair Display', Georgia, serif;
+          font-size: clamp(34px, 9vw, 50px);
+          font-weight: 900;
+          color: white;
+          line-height: 1;
+          letter-spacing: -1px;
+        }
+        .alias-cup { flex-shrink: 0; width: 90px; }
 
-                    {/* Sleeve */}
-                    <div className="absolute inset-x-0 bottom-0 h-36 bg-[#6F4E37] shadow-inner flex flex-col items-center justify-center border-t-2 border-[#6F4E37]">
-                      <div className="px-5 py-3 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20">
-                        <div className="text-[9px] font-black text-white/70 uppercase tracking-[0.2em] mb-1">Barista Difficulty</div>
-                        <div className="text-3xl font-black text-white">{prediction.struggleRating}/10</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        /* Rationale */
+        .rationale-card {
+          padding: 22px 26px;
+        }
+        .rationale-text {
+          font-size: 15px;
+          line-height: 1.7;
+          color: #5A4E46;
+          font-weight: 400;
+        }
 
-              {/* Right Column: Unified Analysis Cards */}
-              <div className="flex-1 space-y-8 flex flex-col">
-                {/* Rationale Card */}
-                <motion.div
-                  initial={{ x: 20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="flex-1 p-8 rounded-[2.5rem] bg-white/60 backdrop-blur-xl border-2 border-white/20 flex flex-col justify-center shadow-lg shadow-[#00704A]/10"
-                >
-                  <div className="flex items-center gap-4 mb-6 text-[#00704A]">
-                    <div className="p-4 rounded-2xl bg-[#00704A]/10">
-                      <Quote className="w-6 h-6 fill-current" />
-                    </div>
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-text/40">Why Starbuckd</h3>
-                  </div>
-                  <p className="text-text/80 italic text-xl md:text-2xl leading-relaxed font-body font-medium">
-                    &quot;{prediction.rationale}&quot;
-                  </p>
-                </motion.div>
+        /* Bottom row */
+        .bottom-row {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-top: 8px;
+        }
+        .retry-btn {
+          display: flex; align-items: center; gap: 8px;
+          padding: 11px 22px;
+          border-radius: 99px;
+          background: white;
+          border: 1.5px solid #E4DDD5;
+          font-size: 13px;
+          font-weight: 600;
+          color: #8A8078;
+          cursor: pointer;
+          font-family: inherit;
+          transition: all 0.15s;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+        .retry-btn:hover {
+          border-color: ${G};
+          color: ${G};
+          box-shadow: 0 2px 10px rgba(0,112,74,0.12);
+        }
 
-                {/* Safe Alias Card */}
-                <motion.div
-                  initial={{ x: 20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="p-8 rounded-[2.5rem] bg-[#6F4E37] text-white shadow-2xl shadow-[#6F4E37]/20 flex flex-col justify-center items-center py-10 relative overflow-hidden"
-                >
-                  <div className="absolute -top-1/4 -right-1/4 w-1/2 h-full bg-white/10 blur-[80px] rounded-full rotate-12" />
+        /* Loading cup bounce */
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        .float { animation: float 1.5s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-                  <div className="relative z-10 w-full text-center space-y-6">
-                    <div className="flex items-center justify-center gap-3 opacity-70">
-                      <ShieldCheck className="w-5 h-5" />
-                      <h3 className="text-[10px] font-black uppercase tracking-[0.3em]">The Barista-Safe Alias</h3>
-                    </div>
+        @media (max-width: 420px) {
+          .alias-banner { flex-direction: column; text-align: center; }
+          .alias-cup { display: none; }
+          .logo-text { font-size: 52px; }
+        }
+      `}</style>
 
-                    <div className="space-y-4">
-                      <div className="text-5xl md:text-7xl font-black tracking-tighter uppercase font-sans">
-                        {prediction.safeAlias}
-                      </div>
-                      <p className="text-sm font-medium opacity-80 max-w-xs mx-auto leading-relaxed">
-                        Your new Starbucks identity, because some battles aren&apos;t worth fighting before coffee.
-                      </p>
-                    </div>
-
-                    {/* <div className="pt-6 border-t border-white/20">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-[10px] font-black uppercase tracking-widest">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          100% Legit Alias
-                        </div>
-                      </div> */}
-                  </div>
-                </motion.div>
-
-                {/* {prediction.provider && (
-                  <div className="text-center md:text-right pt-2">
-                    <span className="text-[10px] font-bold text-text/30 uppercase tracking-[0.4em]">
-                      AI PRO-MODE: {prediction.provider}
-                    </span>
-                  </div>
-                )} */}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Previous Orders Footer */}
-        {history.length > 0 && (
+      <div className="root">
+        <div className="wrap">
+          {/* Logo */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="pt-16 border-t border-primary/10"
+            className="logo"
+            onClick={stage === "result" ? reset : undefined}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="flex items-center justify-between mb-8 px-2">
-              <h3 className="text-xs font-black uppercase tracking-[0.3em] text-text/40">Order Queue</h3>
-              <button onClick={() => { setHistory([]); localStorage.removeItem("starbuckd_history"); }} className="text-[10px] font-black text-text/30 hover:text-[#00704A] transition-colors uppercase flex items-center gap-2 cursor-pointer">
-                <Trash2 className="w-3.5 h-3.5" />
-                Clear Queue
-              </button>
+            <div className="logo-text">
+              {/* <Coffee className="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 text-[#00704A] flex-shrink-0" /> */}
+              Starbuck<span className="text-[#6F4E37] ml-[-7px]">&apos;d</span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-              {history.map((h, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleUpdateUrl(h.name)}
-                  className="px-4 py-3 rounded-2xl bg-white/60 backdrop-blur-xl border-2 border-white/20 text-sm font-bold text-text/60 hover:border-[#6F4E37]/50 hover:text-[#6F4E37] transition-all text-center truncate shadow-md hover:shadow-lg active:scale-95 cursor-pointer"
-                >
-                  {h.name}
-                </button>
-              ))}
-            </div>
+            <p className="logo-sub">See how the barista hears your name</p>
           </motion.div>
-        )}
-      </motion.div>
-    </div>
+
+          {/* Input */}
+          <AnimatePresence>
+            {stage !== "result" && (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16, scale: 0.97 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {error && <div className="error-bar">⚠ {error}</div>}
+                <form onSubmit={submit} className="input-wrap">
+                  <input
+                    ref={inputRef}
+                    className="main-input"
+                    type="text"
+                    value={inputVal}
+                    onChange={e => setInputVal(e.target.value)}
+                    placeholder="What's your name?"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    spellCheck={false}
+                  />
+                  <button className="go-btn" type="submit" disabled={!inputVal.trim() || stage === "loading"}>
+                    {stage === "loading"
+                      ? <RefreshCw size={18} style={{ animation: "spin 0.7s linear infinite" }} />
+                      : <ArrowUp size={18} />
+                    }
+                  </button>
+                </form>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Loading */}
+          <AnimatePresence>
+            {stage === "loading" && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.35 }}
+                style={{ textAlign: "center", padding: "40px 0" }}
+              >
+                <Steam active={true} />
+                <div className="float" style={{ display: "inline-block" }}>
+                  <Cup starbuckdName="???" />
+                </div>
+                <p style={{ marginTop: 16, fontSize: 13, color: "#A89E94", fontWeight: 500 }}>
+                  Consulting the barista...
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Results */}
+          <AnimatePresence mode="wait">
+            {stage === "result" && prediction && (
+              <motion.div
+                key="result"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="result-grid"
+              >
+                {/* Name comparison + difficulty */}
+                <TiltCard className="card name-card" delay={0.05}>
+                  <div className="names-row">
+                    <div className="name-block">
+                      <div className="name-label">You said</div>
+                      <div className="name-val">{submittedName}</div>
+                    </div>
+                    <div className="arrow-div">→</div>
+                    <div className="name-block">
+                      <div className="name-label">They wrote</div>
+                      <div className="name-val butchered">{prediction.starbuckdName}</div>
+                    </div>
+                  </div>
+                  <DifficultyMeter rating={Number(prediction.struggleRating)} />
+                </TiltCard>
+
+                {/* Alias banner with mini cup */}
+                <TiltCard delay={0.12}>
+                  <div className="alias-banner">
+                    <div>
+                      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>
+                        ✦ Your safe alias
+                      </div>
+                      <div className="alias-text">{prediction.safeAlias}</div>
+                      <div style={{ marginTop: 8, fontSize: 12, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>
+                        Use this. Save yourself.
+                      </div>
+                    </div>
+                    <div className="alias-cup">
+                      <Steam active={true} />
+                      <Cup starbuckdName={prediction.safeAlias} />
+                    </div>
+                  </div>
+                </TiltCard>
+
+                {/* Rationale */}
+                <TiltCard className="card rationale-card" delay={0.2}>
+                  <Tag color={BROWN}>☕ Why this happened</Tag>
+                  <p className="rationale-text" style={{ marginTop: 12 }}>
+                    {prediction.rationale}
+                  </p>
+                </TiltCard>
+
+                {/* Action row */}
+                <div className="bottom-row">
+                  <button className="retry-btn" onClick={reset}>
+                    <RotateCcw size={13} />
+                    Try another name
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Idle empty state */}
+          <AnimatePresence>
+            {stage === "idle" && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: 0.3 }}
+                style={{ textAlign: "center", padding: "32px 0 12px" }}
+              >
+                <Steam active={false} />
+                <div style={{ opacity: 0.35 }}>
+                  <Cup starbuckdName="You?" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* History */}
+          {stage !== "loading" && (
+            <motion.div style={{ marginTop: 32 }}>
+              <HistoryStrip
+                history={history}
+                onSelect={name => { setInputVal(name); predict(name); }}
+                onClear={() => { setHistory([]); localStorage.removeItem("sbhist"); }}
+              />
+            </motion.div>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 
 export default function Home() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <RefreshCw className="w-8 h-8 animate-spin text-primary" />
+      <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", background: CREAM }}>
+        <RefreshCw size={24} style={{ color: G, animation: "spin 0.7s linear infinite" }} />
       </div>
     }>
-      <StarbuckdContent />
+      <App />
     </Suspense>
   );
 }
