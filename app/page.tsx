@@ -70,8 +70,29 @@ function AnimNum({ to }: { to: number }) {
   return <>{cur}</>;
 }
 
+function getCupTextLines(rawName: string) {
+  const name = (rawName || "").trim();
+  if (!name) return ["?"];
+  if (name.length <= 8) return [name];
+
+  const parts = name.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    const first = parts[0];
+    const second = parts.slice(1).join(" ");
+    if (first.length <= 10 && second.length <= 10) return [first, second];
+  }
+
+  const mid = Math.ceil(name.length / 2);
+  return [name.slice(0, mid), name.slice(mid)];
+}
+
 // ─── Cup illustration ─────────────────────────────────────────────────────────
 function Cup({ starbuckdName }: { starbuckdName: string }) {
+  const lines = getCupTextLines(starbuckdName);
+  const maxLen = Math.max(...lines.map((line) => line.length));
+  const fontSize = maxLen > 10 ? 15 : maxLen > 8 ? 17 : 20;
+  const startY = lines.length === 1 ? 86 : 78;
+
   return (
     <svg viewBox="0 0 160 240" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", maxWidth: 200, margin: "0 auto", display: "block", filter: "drop-shadow(0 24px 40px rgba(0,0,0,0.18))" }}>
       <defs>
@@ -118,28 +139,23 @@ function Cup({ starbuckdName }: { starbuckdName: string }) {
       {/* Highlight */}
       <path d="M38 32 L48 28 L52 180 L40 175 Z" fill="white" opacity="0.14" clipPath="url(#cup-clip)" />
 
-      {/* Name text */}
-      <foreignObject x="28" y="36" width="104" height="82">
-        <div
-          style={{
-            width: "100%", height: "100%", display: "flex",
-            alignItems: "center", justifyContent: "center",
-            padding: "6px", textAlign: "center",
-          }}>
-          <span style={{
-            fontFamily: "'Caveat', 'Permanent Marker', cursive",
-            fontSize: starbuckdName?.length > 7 ? 18 : starbuckdName?.length > 5 ? 22 : 26,
-            color: "#2C1A0E",
-            lineHeight: 1.15,
-            fontWeight: 700,
-            wordBreak: "break-word",
-            transform: "rotate(-2deg)",
-            display: "block",
-          }}>
-            {starbuckdName}
-          </span>
-        </div>
-      </foreignObject>
+      {/* Name text (pure SVG for better mobile alignment than foreignObject) */}
+      <text
+        x="80"
+        y={startY}
+        textAnchor="middle"
+        fill="#2C1A0E"
+        fontFamily="'Caveat', 'Permanent Marker', cursive"
+        fontSize={fontSize}
+        fontWeight="700"
+        style={{ transform: "rotate(-2deg)", transformOrigin: "80px 84px" }}
+      >
+        {lines.map((line, i) => (
+          <tspan key={`${line}-${i}`} x="80" dy={i === 0 ? 0 : 18}>
+            {line}
+          </tspan>
+        ))}
+      </text>
     </svg>
   );
 }
