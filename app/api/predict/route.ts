@@ -8,57 +8,81 @@ interface PredictionTask {
     model: string;
 }
 
-async function runPrediction(name: string, task: PredictionTask, signal: AbortSignal) {
-    const prompt = `You are a LEGENDARY comedy writer specializing in the hilariously chaotic world of Indian names at American Starbucks. Your mission: maximum giggles.
-
-YOUR MISSION:
-Transform "${name}" into the most hilariously wrong (but believable) Starbucks cup spelling that will make people CACKLE.
-
-THE AMERICAN BARISTA REALITY:
-- They've never heard these sounds before: retroflex consonants, aspirated sounds, Sanskrit origins
-- Their brain desperately tries to map unfamiliar sounds to familiar English words
-- They're convinced you said something they recognize (even if it makes NO sense)
-- Classic disasters: "Rajesh" → "Roger," "Priya" → "Bria," "Nikhil" → "Nipple" (yes, really)
-
-YOUR COMEDY GOLDMINE - INDIAN NAME PATTERNS:
-1. **The English Name Autocorrect**: "Aarav" → "Aaron," "Ananya" → "Anya"
-2. **The Accidental Word**: "Hardik" → "Hard Disk," "Diksha" → "Dixie Cup"
-3. **The Celebrity Mix-up**: "Hrithik" → "Rick," "Deepika" → "Deepak Chopra"
-4. **The Phonetic Nightmare**: Drop half the syllables, add random consonants
-5. **The "I Gave Up"**: Just write something vaguely similar with 50% fewer letters
-
-GO MAXIMUM ABSURD while staying believable. Think:
-- What random English word sounds kinda similar?
-- What if they only caught half the syllables?
-- What common American name is "close enough"?
-- Bonus: Tech terms, food items, place names that sound similar
-
-OUTPUT (JSON ONLY - no markdown, no code blocks):
-{
-  "starbuckdName": "The magnificently wrong version",
-  "rationale": "Your FUNNIEST explanation - this is the punchline!",
-  "safeAlias": "A simple name that SOUNDS similar and preserves the vibe of the original",
-  "struggleRating": <number 1-10>
+function normalizeNameKey(value: string) {
+    return value.toLowerCase().replace(/[^a-z]/g, "");
 }
 
-SAFE ALIAS RULES (CRITICAL):
-- MUST sound phonetically similar to "${name}" - keep key sounds/syllables
-- Should feel like "close enough" not "completely different person"
-- Think: "Priya" → "Ria" (not "Sarah"), "Rohan" → "Ron" (not "Dave"), "Anika" → "Nika" (not "Ashley")
-- User should think "yeah, that's a shortened/easier version of MY name"
-- Preserve the first sound/letter when possible for familiarity
+function validatePredictionResult(inputName: string, raw: any) {
+    const starbuckdName = String(raw?.starbuckdName ?? "").trim();
+    const rationale = String(raw?.rationale ?? "").trim();
+    const safeAlias = String(raw?.safeAlias ?? "").trim();
+    const struggleRating = Number(raw?.struggleRating);
 
-RATIONALE TIPS FOR MAX FUNNY:
-- Reference what they THOUGHT they heard
-- Add a sarcastic observation about American barista logic
-- Make it feel like a roast but keep it playful
-- Example: "The barista heard your name and their brain said 'close enough to Jennifer!'"
+    if (!starbuckdName || !rationale || !safeAlias) {
+        throw new Error("Model returned missing required fields");
+    }
 
-TONE: Sharp, edgy, relatable to anyone who's had their name butchered. Channel the frustration AND the humor.
+    if (!Number.isFinite(struggleRating) || struggleRating < 1 || struggleRating > 10) {
+        throw new Error("Model returned invalid struggleRating");
+    }
 
-REMEMBER: Indian names are a GOLDMINE for comedy because of the phonetic gap. Lean into it hard.
+    const userKey = normalizeNameKey(inputName);
+    const baristaKey = normalizeNameKey(starbuckdName);
+    const aliasKey = normalizeNameKey(safeAlias);
 
-Return ONLY the JSON object.`;
+    // Enforce all 3 identity outputs to be distinct.
+    if (!baristaKey || !aliasKey || userKey === baristaKey || userKey === aliasKey || baristaKey === aliasKey) {
+        throw new Error("Model returned non-distinct names");
+    }
+
+    return {
+        starbuckdName,
+        rationale,
+        safeAlias,
+        struggleRating: Math.round(struggleRating),
+    };
+}
+
+async function runPrediction(name: string, task: PredictionTask, signal: AbortSignal) {
+    const prompt = `You are writing a funny but plausible "coffee cup name prediction."
+
+INPUT NAME: "${name}"
+
+TASK:
+Return ONE JSON object with:
+1) "starbuckdName" = what the barista might write on the cup
+2) "safeAlias" = a simpler, coffee-safe version the user can use next time
+3) "rationale" = 1-2 sentence funny explanation of the mismatch
+4) "struggleRating" = number from 1 to 10
+
+STRICT OUTPUT RULES:
+- Return JSON only. No markdown. No code fences.
+- ALL THREE names must be different:
+  - input name != starbuckdName
+  - input name != safeAlias
+  - starbuckdName != safeAlias
+- Keep names clean and non-offensive.
+
+QUALITY RULES:
+- Funny, playful, and believable, not mean.
+- The safeAlias must still sound close to the original name.
+- If the input name is simple/common, keep mistakes subtle:
+  - only slightly wrong barista spelling
+  - lower struggleRating (1-4)
+- If the input name is phonetically complex, mistakes can be more dramatic:
+  - medium/high struggleRating (5-10)
+
+EXAMPLES OF TONE (not exact outputs):
+- "Rohan" -> barista writes "Rowan", alias "Ro"
+- "Ananya" -> barista writes "Anaya", alias "Anya"
+
+RETURN FORMAT:
+{
+  "starbuckdName": "string",
+  "rationale": "string",
+  "safeAlias": "string",
+  "struggleRating": 1
+}`;
 
     if (task.provider === 'nvidia') {
         const apiKey = process.env.NVIDIA_API_KEY;
@@ -91,7 +115,8 @@ Return ONLY the JSON object.`;
 
         const data = await response.json();
         const content = data.choices[0].message.content;
-        return { ...JSON.parse(content.replace(/```json|```/g, "").trim()), provider: `nvidia (${task.model})` };
+        const parsed = JSON.parse(content.replace(/```json|```/g, "").trim());
+        return { ...validatePredictionResult(name, parsed), provider: `nvidia (${task.model})` };
     } else {
         const model = genAI.getGenerativeModel({ model: task.model });
 
@@ -100,7 +125,8 @@ Return ONLY the JSON object.`;
         const predictionPromise = (async () => {
             const result = await model.generateContent(prompt);
             const text = (await result.response).text();
-            return { ...JSON.parse(text.replace(/```json|```/g, "").trim()), provider: `gemini (${task.model})` };
+            const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
+            return { ...validatePredictionResult(name, parsed), provider: `gemini (${task.model})` };
         })();
 
         const abortPromise = new Promise((_, reject) => {
