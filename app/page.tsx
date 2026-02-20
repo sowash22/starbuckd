@@ -215,7 +215,7 @@ function HistoryStrip({ history, onSelect, onClear }: HistoryStripProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
       style={{ position: "relative" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <span style={{ fontSize: 10, fontWeight: 700, color: "#B0A89E", letterSpacing: "0.1em", textTransform: "uppercase" }}>Recent</span>
+        <span style={{ fontSize: 10, fontWeight: 700, color: "#B0A89E", letterSpacing: "0.1em", textTransform: "uppercase" }}>Queue</span>
         <button onClick={onClear} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 10, fontWeight: 700, color: "#C0B8B0", textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "inherit" }}>
           Clear
         </button>
@@ -375,13 +375,13 @@ function App() {
           user-select: none;
         }
         .logo-text {
-          font-family: 'Playfair Display', Georgia, serif;
-          font-size: clamp(52px, 14vw, 76px);
+          font-family: 'Caveat', 'Comic Sans MS', 'Trebuchet MS', cursive;
+          font-size: clamp(58px, 15vw, 86px);
           font-weight: 700;
-          color: #E9DED2;
-          line-height: 0.96;
-          letter-spacing: -1.2px;
-          text-shadow: 0 1px 8px rgba(0, 0, 0, 0.18);
+          color: #E6D5C6;
+          line-height: 0.92;
+          letter-spacing: 0.2px;
+          text-shadow: 0 1px 5px rgba(0, 0, 0, 0.12);
         }
         .logo-accent { color: ${G}; }
         .logo-sub {
@@ -604,7 +604,7 @@ function App() {
           >
             <div className="logo-text">
               {/* <Coffee className="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 text-[#00704A] flex-shrink-0" /> */}
-              Starbuck<span className="text-[#6F4E37] ml-[-7px]">&apos;d</span>
+              Starbuck<span className="text-[#B58963] ml-[-4px]">&apos;d</span>
             </div>
             <p className="logo-sub">See how barists will butcher your name and find a coffee safe alias</p>
           </motion.div>
