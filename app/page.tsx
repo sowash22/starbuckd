@@ -107,9 +107,13 @@ function Cup({ starbuckdName }: { starbuckdName: string }) {
       {/* Sleeve */}
       <path d="M28 128 L34 220 Q40 232 80 232 Q120 232 126 220 L132 128 Z" fill="url(#sg1)" clipPath="url(#cup-clip)" />
 
-      {/* Green logo dot */}
-      <circle cx="80" cy="182" r="24" fill={G} opacity="0.92" />
-      <text x="80" y="188" textAnchor="middle" fontSize="16" fill="white" fontFamily="serif">✦</text>
+      {/* Mountainside estate emblem */}
+      <circle cx="80" cy="182" r="23" fill="#E8DDD1" opacity="0.96" />
+      <circle cx="80" cy="182" r="22" fill="none" stroke="#B89F8A" strokeWidth="1" />
+      {/* mountains */}
+      <path d="M64 185 L72 174 L78.5 182 L84.5 176.5 L96 185 Z" fill="#6F4E37" opacity="0.9" />
+      <path d="M64 188.5 C70 186.8, 76 186.9, 82 188.2 C88.5 189.5, 92.5 189.4, 96 188.5" stroke="#6F4E37" strokeWidth="1.5" strokeLinecap="round" opacity="0.88" />
+      <path d="M66 192 C72 190.6, 78 190.8, 84 192.1 C89 193.1, 93 193.2, 95 192.6" stroke="#8C6A4F" strokeWidth="1.2" strokeLinecap="round" opacity="0.8" />
 
       {/* Highlight */}
       <path d="M38 32 L48 28 L52 180 L40 175 Z" fill="white" opacity="0.14" clipPath="url(#cup-clip)" />
@@ -256,12 +260,30 @@ function App() {
   const [prediction, setPrediction] = useState<Prediction | null>(null);
   const [error, setError] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [loadingLineIndex, setLoadingLineIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const loadingLines = [
+    "Consulting the baristas...",
+    "Translating your name through espresso machine noise...",
+    "Handing your name to someone who heard only half of it...",
+    "Marker uncapped. Confidence questionable.",
+    "Generating a cup-ready identity crisis...",
+  ];
 
   useEffect(() => {
     try { const s = localStorage.getItem("sbhist"); if (s) setHistory(JSON.parse(s)); } catch { }
     inputRef.current?.focus();
   }, []);
+
+  useEffect(() => {
+    if (stage !== "loading") return;
+    setLoadingLineIndex(0);
+    const id = window.setInterval(() => {
+      setLoadingLineIndex(prev => (prev + 1) % loadingLines.length);
+    }, 2200);
+    return () => window.clearInterval(id);
+  }, [stage, loadingLines.length]);
 
   const predict = useCallback(async (name: string) => {
     if (!name.trim()) return;
@@ -635,7 +657,7 @@ function App() {
                   <Cup starbuckdName="???" />
                 </div>
                 <p style={{ marginTop: 16, fontSize: 13, color: "#A89E94", fontWeight: 500 }}>
-                  Consulting the barista...
+                  {loadingLines[loadingLineIndex]}
                 </p>
               </motion.div>
             )}
@@ -673,11 +695,11 @@ function App() {
                   <div className="alias-banner">
                     <div>
                       <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>
-                        ✦ Your safe alias
+                        ✦ Your new coffee safe alias
                       </div>
                       <div className="alias-text">{prediction.safeAlias}</div>
                       <div style={{ marginTop: 8, fontSize: 12, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>
-                        Use this. Save yourself.
+                        Cuz, some battles are not worth fighting over coffee.
                       </div>
                     </div>
                     <div className="alias-cup">
