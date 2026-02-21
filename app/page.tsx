@@ -287,7 +287,7 @@ function TopButcheredList() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.28 }}
-      className="mt-3 rounded-3xl border border-[#DCD2C7] bg-[#F2EFE9] px-3.5 pb-2.5 pt-3 shadow-[0_1px_10px_rgba(0,0,0,0.03)]"
+      className="mt-6 rounded-3xl border border-[#DCD2C7] bg-[#F2EFE9] px-3.5 pb-2.5 pt-3 shadow-[0_1px_10px_rgba(0,0,0,0.03)]"
     >
       <div className="mb-2 flex items-center justify-between">
         <span className="text-[20px] font-semibold leading-none text-[#A69484]">
