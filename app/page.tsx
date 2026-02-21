@@ -17,6 +17,7 @@ import {
   Mic,
   MicOff,
   ArrowLeft,
+  ArrowRight,
 } from "lucide-react";
 
 const G = "#00704A";
@@ -527,7 +528,7 @@ function App() {
                   {stage === "loading" ? (
                     <RefreshCw size={18} className="animate-spin" />
                   ) : (
-                    <ArrowLeft size={18} />
+                    <ArrowRight size={18} />
                   )}
                 </button>
               </form>
