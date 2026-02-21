@@ -911,7 +911,7 @@ function App() {
               >
                 <Steam active={false} />
                 <div style={{ opacity: 0.35 }}>
-                  <Cup starbuckdName="You?" />
+                  <Cup starbuckdName="your name?" />
                 </div>
               </motion.div>
             )}
