@@ -219,7 +219,7 @@ function DifficultyMeter({ rating }: { rating: number }) {
     <div className="w-full">
       <div className="mb-2 flex items-baseline justify-between">
         <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#9B8E85]">
-          How hard this is to hear
+          How hard is your name?
         </span>
         <span className="text-[13px] font-extrabold" style={{ color }}>
           <AnimNum to={Number(rating)} />
@@ -562,8 +562,8 @@ function App() {
               transition={{ duration: 0.3 }}
               className="flex flex-col gap-3"
             >
-              <Card delay={0.05} className="border-[#DCD2C7] bg-[#F2EFE9] px-7 py-7 shadow-[0_2px_14px_rgba(0,0,0,0.04)]">
-                <div className="mb-2 grid grid-cols-[1fr_52px_1fr] items-start gap-x-2.5">
+              <Card delay={0.05} className="border-[#DCD2C7] bg-[#F2EFE9] px-7 py-10 shadow-[0_2px_14px_rgba(0,0,0,0.04)]">
+                <div className="mb-4 grid grid-cols-[1fr_52px_1fr] items-start gap-x-2.5">
                   <div className="min-w-0">
                     <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#B0A89E]">
                       You said
@@ -573,7 +573,7 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="flex translate-y-[14px] items-center justify-center text-2xl text-[#D0C8C0]">→</div>
+                  <div className="flex translate-y-[24px] items-center justify-center text-2xl text-[#D0C8C0]">→</div>
 
                   <div className="min-w-0">
                     <div className="mb-1.5 text-left text-[10px] font-bold uppercase tracking-[0.1em] text-[#B0A89E]">
@@ -589,19 +589,19 @@ function App() {
               </Card>
 
               <Card delay={0.12} className="border-[#0C5F41] bg-gradient-to-br from-[#00704A] via-[#006241] to-[#005236] p-0 shadow-[0_6px_24px_rgba(0,67,45,0.35)]">
-                <div className="relative overflow-hidden rounded-[20px] px-7 py-7">
+                <div className="relative overflow-hidden rounded-[20px] px-7 py-1">
                   <div className="relative z-10 flex items-center justify-between gap-4">
                     <div className="max-w-[68%]">
-                    <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-white/60">
-                      ✦ Your coffee safe alias
+                      <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-white/60">
+                        ✦ Your coffee safe alias
+                      </div>
+                      <div className="font-serif text-[clamp(34px,9vw,50px)] font-black leading-none tracking-[-1px] text-white">
+                        {prediction.safeAlias}
+                      </div>
+                      <div className="mt-2 text-xs font-medium text-white/70">
+                        Because some battles are not worth fighting over coffee.
+                      </div>
                     </div>
-                    <div className="font-serif text-[clamp(34px,9vw,50px)] font-black leading-none tracking-[-1px] text-white">
-                      {prediction.safeAlias}
-                    </div>
-                    <div className="mt-2 text-xs font-medium text-white/70">
-                      Because some battles are not worth fighting over coffee.
-                    </div>
-                  </div>
                     <div className="relative z-10 flex w-[90px] shrink-0 flex-col items-center justify-center sm:w-[118px]">
                       <Steam active={true} compact={true} />
                       <Cup starbuckdName={prediction.safeAlias} />
@@ -612,7 +612,7 @@ function App() {
 
               <Card delay={0.2} className="border-[#DCD2C7] bg-[#F2EFE9] px-[26px] py-[22px] shadow-[0_2px_14px_rgba(0,0,0,0.04)]">
                 <span className="inline-flex items-center gap-[5px] rounded-full border border-[#6F4E3730] bg-[#6F4E3718] px-2.5 py-[3px] text-[10px] font-bold uppercase tracking-[0.08em] text-[#6F4E37]">
-                  ☕ Why butchered
+                  ☕ Why I butchered
                 </span>
                 <p className="mt-3 text-[15px] font-normal leading-[1.7] text-[#5A4E46]">
                   {prediction.rationale}
