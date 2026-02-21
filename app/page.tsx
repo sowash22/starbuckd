@@ -598,7 +598,7 @@ function App() {
                       <div className="font-serif text-[clamp(34px,9vw,50px)] font-black leading-none tracking-[-1px] text-white">
                         {prediction.safeAlias}
                       </div>
-                      <div className="mt-2 text-xs font-medium text-white/70">
+                      <div className="mt-4 text-xs font-medium text-white/70">
                         Because some battles are not worth fighting over coffee.
                       </div>
                     </div>
