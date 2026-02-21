@@ -608,7 +608,7 @@ function App() {
                     </div>
                     <div className="relative z-10 flex w-[90px] shrink-0 flex-col items-center justify-center sm:w-[118px]">
                       <Steam active={true} compact={true} />
-                      <Cup starbuckdName={prediction.safeAlias} />
+                      <Cup starbuckdName={prediction.starbuckdName} />
                     </div>
                   </div>
                 </div>
