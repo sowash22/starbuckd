@@ -91,67 +91,102 @@ function Cup({ starbuckdName }: { starbuckdName: string }) {
   const lines = getCupTextLines(starbuckdName);
   const maxLen = Math.max(...lines.map((line) => line.length));
   const fontSize = maxLen > 10 ? 15 : maxLen > 8 ? 17 : 20;
-  const startY = lines.length === 1 ? 86 : 78;
+  const startY = lines.length === 1 ? 88 : 80;
 
   return (
-    <svg viewBox="0 0 160 240" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", maxWidth: 200, margin: "0 auto", display: "block", filter: "drop-shadow(0 24px 40px rgba(0,0,0,0.18))" }}>
+    <svg viewBox="0 0 160 250" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", maxWidth: 200, margin: "0 auto", display: "block", filter: "drop-shadow(0 24px 45px rgba(0,0,0,0.22))" }}>
       <defs>
-        <linearGradient id="cg1" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#EDE8E0" />
-          <stop offset="50%" stopColor="#FFFFFF" />
-          <stop offset="100%" stopColor="#D8D0C4" />
+        <linearGradient id="cupMain" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#F5F2EE" />
+          <stop offset="35%" stopColor="#FFFFFF" />
+          <stop offset="70%" stopColor="#F0ECE4" />
+          <stop offset="100%" stopColor="#D9D3C7" />
         </linearGradient>
-        <linearGradient id="sg1" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#4A3828" />
+        <linearGradient id="sleeveMain" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#5D4037" />
           <stop offset="50%" stopColor={BROWN} />
-          <stop offset="100%" stopColor="#3A2A1A" />
+          <stop offset="100%" stopColor="#3E2723" />
         </linearGradient>
-        <linearGradient id="lid1" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#CEC6BC" />
-          <stop offset="100%" stopColor="#B8B0A4" />
+        <linearGradient id="lidMain" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#DED8D0" />
+          <stop offset="40%" stopColor="#CFC8BF" />
+          <stop offset="100%" stopColor="#BDB5AA" />
         </linearGradient>
-        <clipPath id="cup-clip">
-          <path d="M22 28 L138 28 L126 220 Q120 232 80 232 Q40 232 34 220 Z" />
+        <filter id="innerShadow">
+          <feOffset dx="0" dy="1" />
+          <feGaussianBlur stdDeviation="1" result="offset-blur" />
+          <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse" />
+          <feFlood floodColor="black" floodOpacity="0.2" result="color" />
+          <feComposite operator="in" in="color" in2="inverse" result="shadow" />
+          <feComponentTransfer in="shadow" result="shadow">
+            <feFuncA type="linear" slope="0.5" />
+          </feComponentTransfer>
+          <feComposite operator="over" in="shadow" in2="SourceGraphic" />
+        </filter>
+        <clipPath id="cupClipNew">
+          <path d="M22 35 L138 35 L126 230 Q120 242 80 242 Q40 242 34 230 Z" />
         </clipPath>
       </defs>
 
-      {/* Lid */}
-      <ellipse cx="80" cy="22" rx="62" ry="10" fill="url(#lid1)" />
-      <path d="M18 22 Q18 10 28 8 L132 8 Q142 10 142 22" stroke="#A8A09A" strokeWidth="1.5" fill="url(#lid1)" />
-      {/* Sip hole */}
-      <rect x="60" y="6" width="40" height="9" rx="4.5" fill="#AAA29A" />
-      <rect x="64" y="8" width="32" height="5" rx="2.5" fill="#B8B0A8" />
+      {/* Shadow under lid */}
+      <ellipse cx="80" cy="38" rx="60" ry="8" fill="black" opacity="0.1" />
 
       {/* Cup body */}
-      <path d="M22 28 L138 28 L126 220 Q120 232 80 232 Q40 232 34 220 Z" fill="url(#cg1)" />
+      <path d="M22 35 L138 35 L126 230 Q120 242 80 242 Q40 242 34 230 Z" fill="url(#cupMain)" />
+
+      {/* Subtle vertical texture on cup */}
+      <g opacity="0.05">
+        <line x1="40" y1="40" x2="48" y2="230" stroke="#000" strokeWidth="0.5" />
+        <line x1="120" y1="40" x2="112" y2="230" stroke="#000" strokeWidth="0.5" />
+      </g>
 
       {/* Sleeve */}
-      <path d="M28 128 L34 220 Q40 232 80 232 Q120 232 126 220 L132 128 Z" fill="url(#sg1)" clipPath="url(#cup-clip)" />
+      <path d="M28 135 L34 230 Q40 242 80 242 Q120 242 126 230 L132 135 Z" fill="url(#sleeveMain)" clipPath="url(#cupClipNew)" />
 
-      {/* Mountainside estate emblem */}
-      <circle cx="80" cy="182" r="23" fill="#E8DDD1" opacity="0.96" />
-      <circle cx="80" cy="182" r="22" fill="none" stroke="#B89F8A" strokeWidth="1" />
-      {/* mountains */}
-      <path d="M64 185 L72 174 L78.5 182 L84.5 176.5 L96 185 Z" fill="#6F4E37" opacity="0.9" />
-      <path d="M64 188.5 C70 186.8, 76 186.9, 82 188.2 C88.5 189.5, 92.5 189.4, 96 188.5" stroke="#6F4E37" strokeWidth="1.5" strokeLinecap="round" opacity="0.88" />
-      <path d="M66 192 C72 190.6, 78 190.8, 84 192.1 C89 193.1, 93 193.2, 95 192.6" stroke="#8C6A4F" strokeWidth="1.2" strokeLinecap="round" opacity="0.8" />
+      {/* Sleeve texture lines */}
+      <g clipPath="url(#cupClipNew)" opacity="0.1">
+        {[145, 160, 175, 190, 205, 220].map((y) => (
+          <path key={y} d={`M20 ${y} Q80 ${y + 5} 140 ${y}`} stroke="white" strokeWidth="0.8" fill="none" />
+        ))}
+      </g>
 
-      {/* Highlight */}
-      <path d="M38 32 L48 28 L52 180 L40 175 Z" fill="white" opacity="0.14" clipPath="url(#cup-clip)" />
+      {/* Emblem on sleeve */}
+      <g transform="translate(80, 192)">
+        <circle r="26" fill="#F8F4F0" opacity="0.95" />
+        <circle r="24" fill="none" stroke="#D7CCC8" strokeWidth="1" />
+        {/* Simplified mountain logo */}
+        <path d="M-14 8 L-6 -8 L2 4 L10 -4 L18 8 Z" fill={BROWN} opacity="0.85" />
+        <path d="M-15 12 C-8 10, 8 10, 15 12" stroke={BROWN} strokeWidth="1.5" strokeLinecap="round" opacity="0.8" />
+      </g>
 
-      {/* Name text (pure SVG for better mobile alignment than foreignObject) */}
+      {/* Lid */}
+      <g filter="url(#innerShadow)">
+        <ellipse cx="80" cy="28" rx="64" ry="12" fill="url(#lidMain)" />
+        <path d="M16 28 Q16 12 28 10 L132 10 Q144 12 144 28" stroke="#A8A09A" strokeWidth="1" fill="url(#lidMain)" />
+        {/* Recessed top part */}
+        <ellipse cx="80" cy="24" rx="45" ry="6" fill="none" stroke="#A8A09A" strokeWidth="0.5" opacity="0.5" />
+        {/* Sip hole */}
+        <rect x="58" y="8" width="44" height="10" rx="5" fill="#9E948A" />
+        <rect x="62" y="10" width="36" height="6" rx="3" fill="#B0A69C" />
+      </g>
+
+      {/* Highlights and glares */}
+      <path d="M38 45 L48 40 L52 220 L42 225 Z" fill="white" opacity="0.12" clipPath="url(#cupClipNew)" />
+      <path d="M110 40 L120 45 L110 225 L100 220 Z" fill="white" opacity="0.06" clipPath="url(#cupClipNew)" />
+
+      {/* Name text */}
       <text
         x="80"
         y={startY}
         textAnchor="middle"
-        fill="#2C1A0E"
+        fill="#1A110A"
         fontFamily="'Caveat', 'Permanent Marker', cursive"
         fontSize={fontSize}
         fontWeight="700"
-        style={{ transform: "rotate(-2deg)", transformOrigin: "80px 84px" }}
+        style={{ transform: "rotate(-1.5deg)", transformOrigin: "80px 84px", filter: "drop-shadow(0.5px 0.5px 0.5px rgba(0,0,0,0.1))" }}
       >
         {lines.map((line, i) => (
-          <tspan key={`${line}-${i}`} x="80" dy={i === 0 ? 0 : 18}>
+          <tspan key={`${line}-${i}`} x="80" dy={i === 0 ? 0 : 20}>
             {line}
           </tspan>
         ))}

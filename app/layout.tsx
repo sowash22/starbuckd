@@ -27,6 +27,9 @@ export const metadata: Metadata = {
     template: "%s | Starbuckd",
   },
   description: 'Find out how a barista will inevitably ruin your name on a coffee cup.',
+  icons: {
+    icon: '/icon.svg',
+  },
 }
 
 export default function RootLayout({
