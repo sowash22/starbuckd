@@ -508,7 +508,9 @@ function App() {
     setPrediction(null);
     setInputVal("");
     setError("");
-    setTimeout(() => inputRef.current?.focus(), 50);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => inputRef.current?.focus(), 120);
+    setTimeout(() => inputRef.current?.focus(), 420);
   };
 
   const toggleListening = () => {
@@ -696,15 +698,13 @@ function App() {
         }
         .names-row {
           display: grid;
-          gap: 6px;
-          margin-bottom: 24px;
+          grid-template-columns: 1fr 52px 1fr;
+          column-gap: 10px;
+          align-items: start;
+          margin-bottom: 8px;
         }
-        .name-labels-row,
-        .name-values-row {
-          display: grid;
-          grid-template-columns: 1fr auto 1fr;
-          column-gap: 16px;
-          align-items: center;
+        .name-col {
+          min-width: 0;
         }
         .name-label {
           font-size: 10px;
@@ -712,7 +712,10 @@ function App() {
           letter-spacing: 0.1em;
           text-transform: uppercase;
           color: #B0A89E;
-          margin-bottom: 0;
+          margin-bottom: 6px;
+        }
+        .name-label.right {
+          text-align: left;
         }
         .name-val {
           font-family: 'Playfair Display', Georgia, serif;
@@ -739,14 +742,14 @@ function App() {
           letter-spacing: 0;
         }
         .arrow-div {
-          width: 44px;
-          height: 44px;
+          width: 52px;
+          height: auto;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 22px;
+          font-size: 24px;
           color: #D0C8C0;
-          align-self: center;
+          transform: translateY(14px);
         }
 
         /* Alias banner */
@@ -833,6 +836,18 @@ function App() {
           .alias-banner { flex-direction: column; text-align: center; }
           .alias-cup { display: none; }
           .logo-text { font-size: 52px; }
+          .name-values-row { align-items: start; }
+          .name-val {
+            font-size: 22px;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            line-height: 1.12;
+            word-break: break-word;
+          }
+          .name-val.butchered {
+            font-size: 22px;
+          }
         }
       `}</style>
 
@@ -932,14 +947,15 @@ function App() {
                 {/* Name comparison + difficulty */}
                 <TiltCard className="card name-card" delay={0.05}>
                   <div className="names-row">
-                    <div className="name-labels-row">
+                    <div className="name-col">
                       <div className="name-label">You said</div>
-                      <div />
-                      <div className="name-label">I heard</div>
-                    </div>
-                    <div className="name-values-row">
                       <div className="name-val left">{submittedName}</div>
-                      <div className="arrow-div">→</div>
+                    </div>
+
+                    <div className="arrow-div">→</div>
+
+                    <div className="name-col">
+                      <div className="name-label right">I heard</div>
                       <div className="name-val butchered right">{prediction.starbuckdName}</div>
                     </div>
                   </div>
