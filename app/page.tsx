@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, Suspense, ReactNode, CSSProperties, FormEvent, MouseEvent } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
-import { RefreshCw, ArrowUp, RotateCcw } from "lucide-react";
+import { RefreshCw, ArrowUp, RotateCcw, Mic, MicOff } from "lucide-react";
 
 // ─── Theme ───────────────────────────────────────────────────────────────────
 const G = "#00704A";
@@ -269,6 +269,13 @@ interface Prediction {
   safeAlias: string;
 }
 
+declare global {
+  interface Window {
+    webkitSpeechRecognition?: any;
+    SpeechRecognition?: any;
+  }
+}
+
 function App() {
   const [stage, setStage] = useState<"idle" | "loading" | "result">("idle");
   const [inputVal, setInputVal] = useState("");
@@ -277,7 +284,10 @@ function App() {
   const [error, setError] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loadingLineIndex, setLoadingLineIndex] = useState(0);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const speechRef = useRef<any>(null);
 
   const loadingLines = [
     "Consulting the baristas...",
@@ -290,6 +300,35 @@ function App() {
   useEffect(() => {
     try { const s = localStorage.getItem("sbhist"); if (s) setHistory(JSON.parse(s)); } catch { }
     inputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    setSpeechSupported(true);
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = (event: any) => {
+      const heard = event?.results?.[0]?.[0]?.transcript?.trim();
+      if (heard) setInputVal(heard);
+    };
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+
+    speechRef.current = recognition;
+
+    return () => {
+      recognition.onresult = null;
+      recognition.onstart = null;
+      recognition.onend = null;
+      recognition.onerror = null;
+      try { recognition.stop(); } catch { }
+    };
   }, []);
 
   useEffect(() => {
@@ -340,6 +379,22 @@ function App() {
     setInputVal("");
     setError("");
     setTimeout(() => inputRef.current?.focus(), 50);
+  };
+
+  const toggleListening = () => {
+    const recognition = speechRef.current;
+    if (!recognition) return;
+
+    try {
+      if (isListening) {
+        recognition.stop();
+      } else {
+        setError("");
+        recognition.start();
+      }
+    } catch {
+      setIsListening(false);
+    }
   };
 
   return (
@@ -415,7 +470,7 @@ function App() {
         }
         .main-input {
           width: 100%;
-          padding: 20px 70px 20px 24px;
+          padding: 20px 128px 20px 24px;
           font-size: 18px;
           font-weight: 600;
           font-family: 'Inter', sans-serif;
@@ -451,6 +506,27 @@ function App() {
         .go-btn:hover { background: #005C3B; }
         .go-btn:active { transform: translateY(-50%) scale(0.92); }
         .go-btn:disabled { background: #D0C8C0; box-shadow: none; cursor: not-allowed; }
+        .mic-btn {
+          position: absolute;
+          right: 66px; top: 50%;
+          transform: translateY(-50%);
+          width: 42px; height: 42px;
+          border-radius: 12px;
+          background: #F4F0EA;
+          border: 1.5px solid #DDD3C8;
+          cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          color: #8D7A6A;
+          transition: all 0.15s;
+        }
+        .mic-btn:hover { border-color: ${G}; color: ${G}; background: #F6FBF9; }
+        .mic-btn:active { transform: translateY(-50%) scale(0.95); }
+        .mic-btn.active {
+          border-color: ${G};
+          color: white;
+          background: ${G};
+          box-shadow: 0 4px 14px rgba(0,112,74,0.25);
+        }
 
         /* Error */
         .error-bar {
@@ -647,6 +723,17 @@ function App() {
                     autoCorrect="off"
                     spellCheck={false}
                   />
+                  {speechSupported && (
+                    <button
+                      type="button"
+                      className={`mic-btn ${isListening ? "active" : ""}`}
+                      onClick={toggleListening}
+                      aria-label={isListening ? "Stop listening" : "Speak your name"}
+                      title={isListening ? "Stop listening" : "Speak your name"}
+                    >
+                      {isListening ? <MicOff size={16} /> : <Mic size={16} />}
+                    </button>
+                  )}
                   <button className="go-btn" type="submit" disabled={!inputVal.trim() || stage === "loading"}>
                     {stage === "loading"
                       ? <RefreshCw size={18} style={{ animation: "spin 0.7s linear infinite" }} />
