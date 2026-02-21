@@ -16,6 +16,7 @@ import {
   RotateCcw,
   Mic,
   MicOff,
+  ArrowLeft,
 } from "lucide-react";
 
 const G = "#00704A";
@@ -289,7 +290,7 @@ function TopButcheredList() {
       className="mt-3 rounded-3xl border border-[#DCD2C7] bg-[#F2EFE9] px-3.5 pb-2.5 pt-3 shadow-[0_1px_10px_rgba(0,0,0,0.03)]"
     >
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-[20px] font-semibold leading-none text-[#A69484] [font-family:'Caveat','Permanent Marker',cursive]">
+        <span className="text-[20px] font-semibold leading-none text-[#A69484]">
           Barista&apos;s wall of shame
         </span>
         <span className="text-[10px] font-bold uppercase tracking-[0.06em] text-[#9D8F84]">Top 10</span>
@@ -299,11 +300,11 @@ function TopButcheredList() {
         {TOP_BUTCHERED_NAMES.map((entry, i) => (
           <div key={`${entry.original}-${entry.cup}`} className="flex w-full items-center gap-[5px] py-0.5">
             <span className="min-w-[14px] text-[10px] font-bold text-[#B3A497]">{i + 1}.</span>
-            <span className="whitespace-nowrap text-[15px] font-semibold text-[#1E3932] [font-family:'Caveat','Permanent Marker',cursive]">
+            <span className="whitespace-nowrap text-[15px] font-semibold text-[#1E3932]">
               {entry.original}
             </span>
             <span className="text-[11px] font-bold text-[#B9AB9E]">→</span>
-            <span className="mt-[1px] whitespace-nowrap text-[20px] font-semibold leading-none text-[#6F4E37] [font-family:'Caveat','Permanent Marker',cursive]">
+            <span className="mt-[1px] whitespace-nowrap text-[20px] font-semibold leading-none text-[#6F4E37] [font-family:'Caveat','Permanent_Marker',cursive]">
               {entry.cup}
             </span>
           </div>
@@ -526,7 +527,7 @@ function App() {
                   {stage === "loading" ? (
                     <RefreshCw size={18} className="animate-spin" />
                   ) : (
-                    <ArrowUp size={18} />
+                    <ArrowLeft size={18} />
                   )}
                 </button>
               </form>
@@ -575,13 +576,13 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="flex translate-y-[24px] items-center justify-center text-2xl text-[#D0C8C0]">→</div>
+                  <div className="flex translate-y-[24px] translate-x-[10px] items-center justify-center text-2xl text-[#D0C8C0]">→</div>
 
                   <div className="min-w-0">
                     <div className="mb-1 text-left text-[10px] font-bold uppercase tracking-[0.1em] text-[#B0A89E]">
                       I heard
                     </div>
-                    <div className="whitespace-nowrap text-left text-[clamp(24px,6vw,32px)] font-bold leading-[1.05] text-[#6F4E37] [font-family:'Caveat','Permanent Marker',cursive] sm:whitespace-nowrap">
+                    <div className="whitespace-nowrap text-left text-[clamp(24px,6vw,32px)] font-bold leading-[1.05] text-[#6F4E37] [font-family:'Caveat','Permanent_Marker',cursive] sm:whitespace-nowrap">
                       {prediction.starbuckdName}
                     </div>
                   </div>
