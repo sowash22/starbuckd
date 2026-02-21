@@ -802,7 +802,7 @@ function App() {
                       </div>
                       <div className="alias-text">{prediction.safeAlias}</div>
                       <div style={{ marginTop: 8, fontSize: 12, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>
-                        Cuz, some battles are not worth fighting over coffee.
+                        Because some battles are not worth fighting over coffee.
                       </div>
                     </div>
                     <div className="alias-cup">
