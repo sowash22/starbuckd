@@ -695,14 +695,16 @@ function App() {
           box-shadow: 0 2px 14px rgba(0,0,0,0.04);
         }
         .names-row {
-          display: flex;
-          align-items: center;
-          gap: 0;
+          display: grid;
+          gap: 6px;
           margin-bottom: 24px;
         }
-        .name-block {
-          flex: 1;
-          min-width: 0;
+        .name-labels-row,
+        .name-values-row {
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
+          column-gap: 16px;
+          align-items: center;
         }
         .name-label {
           font-size: 10px;
@@ -710,7 +712,7 @@ function App() {
           letter-spacing: 0.1em;
           text-transform: uppercase;
           color: #B0A89E;
-          margin-bottom: 4px;
+          margin-bottom: 0;
         }
         .name-val {
           font-family: 'Playfair Display', Georgia, serif;
@@ -722,15 +724,29 @@ function App() {
           text-overflow: ellipsis;
           white-space: nowrap;
         }
+        .name-val.left {
+          text-align: left;
+        }
+        .name-val.right {
+          text-align: left;
+        }
         .name-val.butchered {
           color: ${BROWN};
-          font-style: italic;
+          font-family: 'Caveat', 'Permanent Marker', cursive;
+          font-size: clamp(24px, 6vw, 32px);
+          font-weight: 800;
+          font-style: normal;
+          letter-spacing: 0;
         }
         .arrow-div {
-          padding: 0 16px;
+          width: 44px;
+          height: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           font-size: 22px;
           color: #D0C8C0;
-          flex-shrink: 0;
+          align-self: center;
         }
 
         /* Alias banner */
@@ -916,14 +932,15 @@ function App() {
                 {/* Name comparison + difficulty */}
                 <TiltCard className="card name-card" delay={0.05}>
                   <div className="names-row">
-                    <div className="name-block">
+                    <div className="name-labels-row">
                       <div className="name-label">You said</div>
-                      <div className="name-val">{submittedName}</div>
-                    </div>
-                    <div className="arrow-div">→</div>
-                    <div className="name-block">
+                      <div />
                       <div className="name-label">I heard</div>
-                      <div className="name-val butchered">{prediction.starbuckdName}</div>
+                    </div>
+                    <div className="name-values-row">
+                      <div className="name-val left">{submittedName}</div>
+                      <div className="arrow-div">→</div>
+                      <div className="name-val butchered right">{prediction.starbuckdName}</div>
                     </div>
                   </div>
                   <DifficultyMeter rating={Number(prediction.struggleRating)} />
