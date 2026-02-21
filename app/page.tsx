@@ -287,6 +287,19 @@ interface HistoryItem {
   date: string;
 }
 
+const TOP_BUTCHERED_NAMES = [
+  { original: "Srinivasan", cup: "Serena Vision" },
+  { original: "Lakshmi", cup: "Lush Me" },
+  { original: "Xochitl", cup: "So Chill" },
+  { original: "Bhargavi", cup: "Barbie" },
+  { original: "Yasodha", cup: "Yasoda" },
+  { original: "Nguyen", cup: "Win" },
+  { original: "Karthikeyan", cup: "Car Ticket Ian" },
+  { original: "Saoirse", cup: "Sersha" },
+  { original: "Prudhvi", cup: "Broody" },
+  { original: "Siobhan", cup: "Chevon" },
+];
+
 interface HistoryStripProps {
   history: HistoryItem[];
   onSelect: (name: string) => void;
@@ -323,6 +336,54 @@ function HistoryStrip({ history, onSelect, onClear }: HistoryStripProps) {
           >
             {h.name}
           </motion.button>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+function TopButcheredList() {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.28 }}
+      className="card"
+      style={{ marginTop: 12, padding: "12px 14px 11px", borderColor: "#DCD2C7", background: CREAM, boxShadow: "0 1px 10px rgba(0,0,0,0.03)" }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: "#B0A89E", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+          Barista&apos;s wall of shame
+        </span>
+        <span style={{ fontSize: 10, fontWeight: 700, color: "#9D8F84", letterSpacing: "0.06em", textTransform: "uppercase" }}>Top 10</span>
+      </div>
+
+      <div style={{ display: "grid", gap: 5 }}>
+        {TOP_BUTCHERED_NAMES.map((entry, i) => (
+          <div
+            key={`${entry.original}-${entry.cup}`}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "3px 0",
+            }}
+          >
+            <span style={{ fontSize: 10, fontWeight: 700, color: "#B3A497", minWidth: 16 }}>{i + 1}.</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: B, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>
+                {entry.original}
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#B9AB9E" }}>→</span>
+            <span style={{
+              fontFamily: "'Caveat', 'Permanent Marker', cursive",
+              fontSize: 20,
+              lineHeight: 1,
+              color: BROWN,
+              transform: "rotate(-2deg)",
+              whiteSpace: "nowrap",
+              marginTop: 1,
+            }}>{entry.cup}</span>
+          </div>
         ))}
       </div>
     </motion.div>
@@ -766,7 +827,7 @@ function App() {
               {/* <Coffee className="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 text-[#00704A] flex-shrink-0" /> */}
               Starbuck<span className="text-[#B58963] ml-[-4px]">&apos;d</span>
             </div>
-            <p className="logo-sub">I&apos;ll butcher your name, hand you a safer alias, and we'll never speak of this again.</p>
+            <p className="logo-sub">I&apos;ll butcher your name, hand you a safer alias, and we&apos;ll never speak of this again.</p>
           </motion.div>
 
           {/* Input */}
@@ -925,6 +986,7 @@ function App() {
                 onSelect={name => { setInputVal(name); predict(name); }}
                 onClear={() => { setHistory([]); localStorage.removeItem("sbhist"); }}
               />
+              <TopButcheredList />
             </motion.div>
           )}
         </div>
