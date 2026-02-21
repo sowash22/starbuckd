@@ -161,18 +161,51 @@ function Cup({ starbuckdName }: { starbuckdName: string }) {
 }
 
 // ─── Steam ────────────────────────────────────────────────────────────────────
-function Steam({ active }: { active: boolean }) {
+function Steam({ active, compact = false }: { active: boolean; compact?: boolean }) {
   if (!active) return null;
+  const waves = [
+    { path: "M54 50 C42 40, 66 34, 54 24 C44 16, 62 10, 54 2", delay: 0, duration: 3.2 },
+    { path: "M80 50 C68 40, 92 34, 80 24 C70 16, 88 10, 80 2", delay: 0.3, duration: 3.0 },
+    { path: "M106 50 C94 40, 118 34, 106 24 C96 16, 114 10, 106 2", delay: 0.6, duration: 3.3 },
+  ];
+
   return (
-    <div style={{ display: "flex", gap: 10, justifyContent: "center", height: 36, alignItems: "flex-end", marginBottom: 4 }}>
-      {[0, 1, 2].map(i => (
-        <motion.div key={i}
-          animate={{ y: [0, -20, 0], opacity: [0.3, 0.7, 0.3], scaleX: [1, 1.4, 1] }}
-          transition={{ duration: 2.2, delay: i * 0.6, repeat: Infinity, ease: "easeInOut" }}
-          style={{ width: 3, height: 28, borderRadius: 4, background: `linear-gradient(to top, ${BROWN}50, transparent)` }}
+    <motion.svg
+      viewBox="0 0 160 56"
+      style={{
+        display: "block",
+        width: compact ? 88 : 160,
+        height: compact ? 34 : 56,
+        margin: compact ? "0 auto -2px" : "0 auto -6px",
+        pointerEvents: "none",
+      }}
+      aria-hidden="true"
+    >
+      {waves.map((w, i) => (
+        <motion.path
+          key={i}
+          d={w.path}
+          fill="none"
+          stroke="rgba(244, 238, 230, 0.86)"
+          strokeWidth={2.8}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          animate={{
+            y: [0, -7, -14],
+            x: [0, 1.2, -1.2, 0],
+            opacity: [0, 0.62, 0.18, 0],
+            pathLength: [0.2, 1, 1],
+          }}
+          transition={{
+            duration: w.duration,
+            delay: w.delay,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          style={{ filter: "blur(0.2px)" }}
         />
       ))}
-    </div>
+    </motion.svg>
   );
 }
 
@@ -806,7 +839,7 @@ function App() {
                       </div>
                     </div>
                     <div className="alias-cup">
-                      <Steam active={true} />
+                      <Steam active={true} compact={true} />
                       <Cup starbuckdName={prediction.safeAlias} />
                     </div>
                   </div>
