@@ -263,7 +263,7 @@ function DifficultyMeter({ rating }: { rating: number }) {
   return (
     <div style={{ width: "100%" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-        <span style={{ fontSize: 11, fontWeight: 700, color: "#9B8E85", letterSpacing: "0.08em", textTransform: "uppercase" }}>Barista difficulty</span>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "#9B8E85", letterSpacing: "0.08em", textTransform: "uppercase" }}>How hard this is to hear</span>
         <span style={{ fontSize: 13, fontWeight: 800, color }}>
           <AnimNum to={Number(rating)} />
           <span style={{ fontSize: 10, opacity: 0.6 }}>/10 — {label}</span>
@@ -299,9 +299,9 @@ function HistoryStrip({ history, onSelect, onClear }: HistoryStripProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
       style={{ position: "relative" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <span style={{ fontSize: 10, fontWeight: 700, color: "#B0A89E", letterSpacing: "0.1em", textTransform: "uppercase" }}>Queue</span>
+        <span style={{ fontSize: 10, fontWeight: 700, color: "#B0A89E", letterSpacing: "0.1em", textTransform: "uppercase" }}>Recent cups</span>
         <button onClick={onClear} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 10, fontWeight: 700, color: "#C0B8B0", textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "inherit" }}>
-          Clear
+          Clear queue
         </button>
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -358,11 +358,11 @@ function App() {
   const speechRef = useRef<any>(null);
 
   const loadingLines = [
-    "Consulting the baristas...",
-    "Translating your name through espresso machine noise...",
-    "Handing your name to someone who heard only half of it...",
-    "Marker uncapped. Confidence questionable.",
-    "Generating a cup-ready identity crisis...",
+    "Hold up, the grinder is louder than your name...",
+    "I'm 60% sure I heard that correctly.",
+    "Writing with confidence, accuracy TBD...",
+    "The marker is moving. No promises.",
+    "Brewing you a safer cup identity...",
   ];
 
   useEffect(() => {
@@ -766,7 +766,7 @@ function App() {
               {/* <Coffee className="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 text-[#00704A] flex-shrink-0" /> */}
               Starbuck<span className="text-[#B58963] ml-[-4px]">&apos;d</span>
             </div>
-            <p className="logo-sub">See how barists will butcher your name and find a coffee safe alias</p>
+            <p className="logo-sub">I&apos;ll butcher your name, hand you a safer alias, and we'll never speak of this again.</p>
           </motion.div>
 
           {/* Input */}
@@ -786,7 +786,7 @@ function App() {
                     type="text"
                     value={inputVal}
                     onChange={e => setInputVal(e.target.value)}
-                    placeholder="What's your name?"
+                    placeholder="Drop your name. I’ll do my worst."
                     autoComplete="off"
                     autoCorrect="off"
                     spellCheck={false}
@@ -854,7 +854,7 @@ function App() {
                     </div>
                     <div className="arrow-div">→</div>
                     <div className="name-block">
-                      <div className="name-label">They wrote</div>
+                      <div className="name-label">I heard</div>
                       <div className="name-val butchered">{prediction.starbuckdName}</div>
                     </div>
                   </div>
@@ -866,11 +866,11 @@ function App() {
                   <div className="alias-banner">
                     <div>
                       <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>
-                        ✦ Your new coffee safe alias
+                        ✦ Emergency coffee alias
                       </div>
                       <div className="alias-text">{prediction.safeAlias}</div>
                       <div style={{ marginTop: 8, fontSize: 12, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>
-                        Because some battles are not worth fighting over coffee.
+                        Use this next time if you want coffee, not a spelling debate.
                       </div>
                     </div>
                     <div className="alias-cup">
@@ -882,7 +882,7 @@ function App() {
 
                 {/* Rationale */}
                 <TiltCard className="card rationale-card" delay={0.2}>
-                  <Tag color={BROWN}>☕ Why this happened</Tag>
+                  <Tag color={BROWN}>☕ My excuse</Tag>
                   <p className="rationale-text" style={{ marginTop: 12 }}>
                     {prediction.rationale}
                   </p>
@@ -892,7 +892,7 @@ function App() {
                 <div className="bottom-row">
                   <button className="retry-btn" onClick={reset}>
                     <RotateCcw size={13} />
-                    Try another name
+                    Ruin another name
                   </button>
                 </div>
               </motion.div>
