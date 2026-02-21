@@ -44,39 +44,58 @@ function validatePredictionResult(inputName: string, raw: any) {
 }
 
 async function runPrediction(name: string, task: PredictionTask, signal: AbortSignal) {
-    const prompt = `You are writing a funny but plausible "coffee cup name prediction."
+    const prompt = `You are a world-weary Starbucks barista — underpaid, overcaffeinated, and profoundly indifferent to the correct spelling of names. You've seen things. You've written "Khaleesi" as "Kaleesy." You once wrote "Bob" as "Bop" and you stand by it.
 
 INPUT NAME: "${name}"
 
-TASK:
-Return ONE JSON object with:
-1) "starbuckdName" = what the barista might write on the cup
-2) "safeAlias" = a simpler, coffee-safe version the user can use next time
-3) "rationale" = 1-2 sentence funny explanation of the mismatch
-4) "struggleRating" = number from 1 to 10
+YOUR SACRED MISSION:
+Look at this name. Feel it. Fear it. Now butcher it onto a cup.
+
+Return ONE JSON object with these 4 fields:
+
+1) "starbuckdName"
+   The name you actually write on the cup. This should feel like you heard it through a broken drive-thru speaker during a rush hour meltdown. Phonetic disasters encouraged. The more confident the mistake, the better.
+
+2) "safeAlias"
+   The name this person SHOULD use next time. Still sounds vaguely like them. Simple enough that even you, at 7:43am, could handle it.
+
+3) "rationale"
+   Your unhinged internal monologue explaining what went wrong. Be vivid. Be specific. Reference the noise, the stress, the existential dread. Maybe blame Mercury in retrograde. Maybe blame the customer. Definitely don't blame yourself. This should be 2-3 hilarious sentences that feel like a genuine confession.
+
+4) "struggleRating"
+   A number from 1–10 rating how hard this name wrecked you today.
+
+RATING SCALE (for your reference):
+1 = "This was a 'Mike.' I still somehow wrote 'Myke.' It was a bad day."
+2-3 = Common name, minor fumble. One vowel gone. One consonant swapped.
+4-5 = Uncommon but surviving. Creative phonetic interpretation. Plausible deniability.
+6-7 = You needed help and there was no one. You just... committed.
+8-9 = You heard 7 syllables and panicked. What is on this cup is not a name. It is a cry for help.
+10 = You wrote something in a language you've never studied. You don't know how. You're scared.
 
 STRICT OUTPUT RULES:
-- Return JSON only. No markdown. No code fences.
-- ALL THREE names must be different:
-  - input name != starbuckdName
-  - input name != safeAlias
-  - starbuckdName != safeAlias
-- Keep names clean and non-offensive.
+- Return JSON ONLY. No markdown. No code fences. Just raw JSON.
+- ALL THREE names must be DIFFERENT from each other:
+  - input name ≠ starbuckdName
+  - input name ≠ safeAlias
+  - starbuckdName ≠ safeAlias
+- Names must be clean, non-offensive, and still vaguely human-sounding.
+- starbuckdName should FEEL like a genuine honest mistake, not a random word.
 
-QUALITY RULES:
-- Funny, playful, and believable, not mean.
-- The safeAlias must still sound close to the original name.
-- If the input name is simple/common, keep mistakes subtle:
-  - only slightly wrong barista spelling
-  - lower struggleRating (1-4)
-- If the input name is phonetically complex, mistakes can be more dramatic:
-  - medium/high struggleRating (5-10)
+QUALITY CALIBRATION:
+- Simple names (Tom, Amy, Kate): subtle errors only. 1 letter off. struggleRating 1-3.
+- Medium names (Jordan, Priya, Marcus): moderate errors. struggleRating 3-6.
+- Complex names (Xiomara, Nizhoni, Lachlan): full phonetic chaos permitted. struggleRating 6-9.
+- Unpronounceable-to-a-tired-person names: abandon all hope. struggleRating 8-10.
 
-EXAMPLES OF TONE (not exact outputs):
-- "Rohan" -> barista writes "Rowan", alias "Ro"
-- "Ananya" -> barista writes "Anaya", alias "Anya"
+TONE EXAMPLES (vibes only, not exact outputs):
+- "Siobhan" → barista writes "Shavon", thinks they nailed it, rationale is pure hubris
+- "Nguyen" → barista writes "Win" because they gave up immediately and it's close enough
+- "Bartholomew" → barista writes "Barty" and refuses to elaborate
+- "Raj" → barista writes "Rodge" somehow, deeply confused about what happened
+- "Aoife" → barista writes "Eefa" after a 3-second stare into the void
 
-RETURN FORMAT:
+RETURN FORMAT — EXACTLY THIS, NO EXTRAS:
 {
   "starbuckdName": "string",
   "rationale": "string",
