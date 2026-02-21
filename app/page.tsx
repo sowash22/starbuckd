@@ -1,63 +1,63 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, Suspense, ReactNode, CSSProperties, FormEvent, MouseEvent } from "react";
-import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
-import { RefreshCw, ArrowUp, RotateCcw, Mic, MicOff } from "lucide-react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  Suspense,
+  ReactNode,
+  FormEvent,
+} from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  RefreshCw,
+  ArrowUp,
+  RotateCcw,
+  Mic,
+  MicOff,
+} from "lucide-react";
 
-// ─── Theme ───────────────────────────────────────────────────────────────────
 const G = "#00704A";
 const B = "#1E3932";
 const BROWN = "#6F4E37";
 const CREAM = "#F2EFE9";
 
-// ─── Utility ─────────────────────────────────────────────────────────────────
-const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi);
-
-// ─── Tilt Card wrapper ────────────────────────────────────────────────────────
-interface TiltCardProps {
-  children: ReactNode;
-  className?: string;
-  style?: CSSProperties;
-  delay?: number;
+interface Prediction {
+  starbuckdName: string;
+  struggleRating: number | string;
+  rationale: string;
+  safeAlias: string;
 }
 
-function TiltCard({ children, className, style, delay = 0 }: TiltCardProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const rx = useMotionValue(0);
-  const ry = useMotionValue(0);
-  const srx = useSpring(rx, { stiffness: 200, damping: 30 });
-  const sry = useSpring(ry, { stiffness: 200, damping: 30 });
-
-  const onMove = (e: MouseEvent) => {
-    const el = ref.current;
-    if (!el) return;
-    const { left, top, width, height } = el.getBoundingClientRect();
-    const x = (e.clientX - left) / width - 0.5;
-    const y = (e.clientY - top) / height - 0.5;
-    rx.set(y * -10);
-    ry.set(x * 10);
-  };
-  const onLeave = () => { rx.set(0); ry.set(0); };
-
-  return (
-    <motion.div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
-      style={{ rotateX: srx, rotateY: sry, transformStyle: "preserve-3d", perspective: 800, ...style }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+interface HistoryItem {
+  name: string;
+  date: string;
 }
 
-// ─── Animated number ──────────────────────────────────────────────────────────
+const TOP_BUTCHERED_NAMES = [
+  { original: "Srinivasan", cup: "Serena Vision" },
+  { original: "Lakshmi", cup: "Lush Me" },
+  { original: "Xochitl", cup: "So Chill" },
+  { original: "Bhargavi", cup: "Barbie" },
+  { original: "Yasodha", cup: "Yasoda" },
+  { original: "Nguyen", cup: "Win" },
+  { original: "Karthikeyan", cup: "Car Ticket Ian" },
+  { original: "Saoirse", cup: "Sersha" },
+  { original: "Prudhvi", cup: "Broody" },
+  { original: "Siobhan", cup: "Chevon" },
+];
+
+declare global {
+  interface Window {
+    webkitSpeechRecognition?: any;
+    SpeechRecognition?: any;
+  }
+}
+
 function AnimNum({ to }: { to: number }) {
   const [cur, setCur] = useState(0);
+
   useEffect(() => {
     let start = 0;
     const step = () => {
@@ -67,6 +67,7 @@ function AnimNum({ to }: { to: number }) {
     };
     requestAnimationFrame(step);
   }, [to]);
+
   return <>{cur}</>;
 }
 
@@ -86,107 +87,84 @@ function getCupTextLines(rawName: string) {
   return [name.slice(0, mid), name.slice(mid)];
 }
 
-// ─── Cup illustration ─────────────────────────────────────────────────────────
 function Cup({ starbuckdName }: { starbuckdName: string }) {
   const lines = getCupTextLines(starbuckdName);
   const maxLen = Math.max(...lines.map((line) => line.length));
   const fontSize = maxLen > 10 ? 15 : maxLen > 8 ? 17 : 20;
-  const startY = lines.length === 1 ? 88 : 80;
+  const startY = lines.length === 1 ? 86 : 78;
 
   return (
-    <svg viewBox="0 0 160 250" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", maxWidth: 200, margin: "0 auto", display: "block", filter: "drop-shadow(0 24px 45px rgba(0,0,0,0.22))" }}>
+    <svg
+      viewBox="0 0 160 240"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="mx-auto block w-full max-w-[200px] drop-shadow-[0_24px_40px_rgba(0,0,0,0.18)]"
+    >
       <defs>
-        <linearGradient id="cupMain" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#F5F2EE" />
-          <stop offset="35%" stopColor="#FFFFFF" />
-          <stop offset="70%" stopColor="#F0ECE4" />
-          <stop offset="100%" stopColor="#D9D3C7" />
+        <linearGradient id="cg1" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#EDE8E0" />
+          <stop offset="50%" stopColor="#FFFFFF" />
+          <stop offset="100%" stopColor="#D8D0C4" />
         </linearGradient>
-        <linearGradient id="sleeveMain" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#5D4037" />
+        <linearGradient id="sg1" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#4A3828" />
           <stop offset="50%" stopColor={BROWN} />
-          <stop offset="100%" stopColor="#3E2723" />
+          <stop offset="100%" stopColor="#3A2A1A" />
         </linearGradient>
-        <linearGradient id="lidMain" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#DED8D0" />
-          <stop offset="40%" stopColor="#CFC8BF" />
-          <stop offset="100%" stopColor="#BDB5AA" />
+        <linearGradient id="lid1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#CEC6BC" />
+          <stop offset="100%" stopColor="#B8B0A4" />
         </linearGradient>
-        <filter id="innerShadow">
-          <feOffset dx="0" dy="1" />
-          <feGaussianBlur stdDeviation="1" result="offset-blur" />
-          <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse" />
-          <feFlood floodColor="black" floodOpacity="0.2" result="color" />
-          <feComposite operator="in" in="color" in2="inverse" result="shadow" />
-          <feComponentTransfer in="shadow" result="shadow">
-            <feFuncA type="linear" slope="0.5" />
-          </feComponentTransfer>
-          <feComposite operator="over" in="shadow" in2="SourceGraphic" />
-        </filter>
-        <clipPath id="cupClipNew">
-          <path d="M22 35 L138 35 L126 230 Q120 242 80 242 Q40 242 34 230 Z" />
+        <clipPath id="cup-clip">
+          <path d="M22 28 L138 28 L126 220 Q120 232 80 232 Q40 232 34 220 Z" />
         </clipPath>
       </defs>
 
-      {/* Shadow under lid */}
-      <ellipse cx="80" cy="38" rx="60" ry="8" fill="black" opacity="0.1" />
+      <ellipse cx="80" cy="22" rx="62" ry="10" fill="url(#lid1)" />
+      <path
+        d="M18 22 Q18 10 28 8 L132 8 Q142 10 142 22"
+        stroke="#A8A09A"
+        strokeWidth="1.5"
+        fill="url(#lid1)"
+      />
+      <rect x="60" y="6" width="40" height="9" rx="4.5" fill="#AAA29A" />
+      <rect x="64" y="8" width="32" height="5" rx="2.5" fill="#B8B0A8" />
 
-      {/* Cup body */}
-      <path d="M22 35 L138 35 L126 230 Q120 242 80 242 Q40 242 34 230 Z" fill="url(#cupMain)" />
+      <path d="M22 28 L138 28 L126 220 Q120 232 80 232 Q40 232 34 220 Z" fill="url(#cg1)" />
+      <path d="M28 128 L34 220 Q40 232 80 232 Q120 232 126 220 L132 128 Z" fill="url(#sg1)" clipPath="url(#cup-clip)" />
 
-      {/* Subtle vertical texture on cup */}
-      <g opacity="0.05">
-        <line x1="40" y1="40" x2="48" y2="230" stroke="#000" strokeWidth="0.5" />
-        <line x1="120" y1="40" x2="112" y2="230" stroke="#000" strokeWidth="0.5" />
-      </g>
+      <circle cx="80" cy="182" r="23" fill="#E8DDD1" opacity="0.96" />
+      <circle cx="80" cy="182" r="22" fill="none" stroke="#B89F8A" strokeWidth="1" />
+      <path d="M64 185 L72 174 L78.5 182 L84.5 176.5 L96 185 Z" fill="#6F4E37" opacity="0.9" />
+      <path
+        d="M64 188.5 C70 186.8, 76 186.9, 82 188.2 C88.5 189.5, 92.5 189.4, 96 188.5"
+        stroke="#6F4E37"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        opacity="0.88"
+      />
+      <path
+        d="M66 192 C72 190.6, 78 190.8, 84 192.1 C89 193.1, 93 193.2, 95 192.6"
+        stroke="#8C6A4F"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        opacity="0.8"
+      />
 
-      {/* Sleeve */}
-      <path d="M28 135 L34 230 Q40 242 80 242 Q120 242 126 230 L132 135 Z" fill="url(#sleeveMain)" clipPath="url(#cupClipNew)" />
+      <path d="M38 32 L48 28 L52 180 L40 175 Z" fill="white" opacity="0.14" clipPath="url(#cup-clip)" />
 
-      {/* Sleeve texture lines */}
-      <g clipPath="url(#cupClipNew)" opacity="0.1">
-        {[145, 160, 175, 190, 205, 220].map((y) => (
-          <path key={y} d={`M20 ${y} Q80 ${y + 5} 140 ${y}`} stroke="white" strokeWidth="0.8" fill="none" />
-        ))}
-      </g>
-
-      {/* Emblem on sleeve */}
-      <g transform="translate(80, 192)">
-        <circle r="26" fill="#F8F4F0" opacity="0.95" />
-        <circle r="24" fill="none" stroke="#D7CCC8" strokeWidth="1" />
-        {/* Simplified mountain logo */}
-        <path d="M-14 8 L-6 -8 L2 4 L10 -4 L18 8 Z" fill={BROWN} opacity="0.85" />
-        <path d="M-15 12 C-8 10, 8 10, 15 12" stroke={BROWN} strokeWidth="1.5" strokeLinecap="round" opacity="0.8" />
-      </g>
-
-      {/* Lid */}
-      <g filter="url(#innerShadow)">
-        <ellipse cx="80" cy="28" rx="64" ry="12" fill="url(#lidMain)" />
-        <path d="M16 28 Q16 12 28 10 L132 10 Q144 12 144 28" stroke="#A8A09A" strokeWidth="1" fill="url(#lidMain)" />
-        {/* Recessed top part */}
-        <ellipse cx="80" cy="24" rx="45" ry="6" fill="none" stroke="#A8A09A" strokeWidth="0.5" opacity="0.5" />
-        {/* Sip hole */}
-        <rect x="58" y="8" width="44" height="10" rx="5" fill="#9E948A" />
-        <rect x="62" y="10" width="36" height="6" rx="3" fill="#B0A69C" />
-      </g>
-
-      {/* Highlights and glares */}
-      <path d="M38 45 L48 40 L52 220 L42 225 Z" fill="white" opacity="0.12" clipPath="url(#cupClipNew)" />
-      <path d="M110 40 L120 45 L110 225 L100 220 Z" fill="white" opacity="0.06" clipPath="url(#cupClipNew)" />
-
-      {/* Name text */}
       <text
         x="80"
         y={startY}
         textAnchor="middle"
-        fill="#1A110A"
+        fill="#2C1A0E"
         fontFamily="'Caveat', 'Permanent Marker', cursive"
         fontSize={fontSize}
         fontWeight="700"
-        style={{ transform: "rotate(-1.5deg)", transformOrigin: "80px 84px", filter: "drop-shadow(0.5px 0.5px 0.5px rgba(0,0,0,0.1))" }}
+        style={{ transform: "rotate(-2deg)", transformOrigin: "80px 84px" }}
       >
         {lines.map((line, i) => (
-          <tspan key={`${line}-${i}`} x="80" dy={i === 0 ? 0 : 20}>
+          <tspan key={`${line}-${i}`} x="80" dy={i === 0 ? 0 : 18}>
             {line}
           </tspan>
         ))}
@@ -195,9 +173,9 @@ function Cup({ starbuckdName }: { starbuckdName: string }) {
   );
 }
 
-// ─── Steam ────────────────────────────────────────────────────────────────────
 function Steam({ active, compact = false }: { active: boolean; compact?: boolean }) {
   if (!active) return null;
+
   const waves = [
     { path: "M54 50 C42 40, 66 34, 54 24 C44 16, 62 10, 54 2", delay: 0, duration: 3.2 },
     { path: "M80 50 C68 40, 92 34, 80 24 C70 16, 88 10, 80 2", delay: 0.3, duration: 3.0 },
@@ -207,13 +185,7 @@ function Steam({ active, compact = false }: { active: boolean; compact?: boolean
   return (
     <motion.svg
       viewBox="0 0 160 56"
-      style={{
-        display: "block",
-        width: compact ? 88 : 160,
-        height: compact ? 34 : 56,
-        margin: compact ? "0 auto -2px" : "0 auto -6px",
-        pointerEvents: "none",
-      }}
+      className={compact ? "mx-auto -mb-0.5 block h-[34px] w-[88px]" : "mx-auto -mb-1.5 block h-[56px] w-[160px]"}
       aria-hidden="true"
     >
       {waves.map((w, i) => (
@@ -231,12 +203,7 @@ function Steam({ active, compact = false }: { active: boolean; compact?: boolean
             opacity: [0, 0.62, 0.18, 0],
             pathLength: [0.2, 1, 1],
           }}
-          transition={{
-            duration: w.duration,
-            delay: w.delay,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+          transition={{ duration: w.duration, delay: w.delay, repeat: Infinity, ease: "easeInOut" }}
           style={{ filter: "blur(0.2px)" }}
         />
       ))}
@@ -244,95 +211,66 @@ function Steam({ active, compact = false }: { active: boolean; compact?: boolean
   );
 }
 
-// ─── Pill tag ─────────────────────────────────────────────────────────────────
-function Tag({ children, color = G }: { children: ReactNode; color?: string }) {
-  return (
-    <span style={{
-      display: "inline-flex", alignItems: "center", gap: 5,
-      padding: "3px 10px", borderRadius: 99,
-      fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase",
-      background: color + "18", color: color, border: `1px solid ${color}30`,
-    }}>{children}</span>
-  );
-}
-
-// ─── Difficulty meter ─────────────────────────────────────────────────────────
 function DifficultyMeter({ rating }: { rating: number }) {
   const color = rating >= 8 ? "#E53935" : rating >= 5 ? BROWN : G;
   const label = rating >= 8 ? "Brutal" : rating >= 6 ? "Rough" : rating >= 4 ? "Meh" : "Easy";
+
   return (
-    <div style={{ width: "100%" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-        <span style={{ fontSize: 11, fontWeight: 700, color: "#9B8E85", letterSpacing: "0.08em", textTransform: "uppercase" }}>How hard this is to hear</span>
-        <span style={{ fontSize: 13, fontWeight: 800, color }}>
+    <div className="w-full">
+      <div className="mb-2 flex items-baseline justify-between">
+        <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#9B8E85]">
+          How hard this is to hear
+        </span>
+        <span className="text-[13px] font-extrabold" style={{ color }}>
           <AnimNum to={Number(rating)} />
-          <span style={{ fontSize: 10, opacity: 0.6 }}>/10 — {label}</span>
+          <span className="text-[10px] opacity-60">/10 — {label}</span>
         </span>
       </div>
-      <div style={{ height: 5, background: "#E8E2DA", borderRadius: 99, overflow: "hidden" }}>
+      <div className="h-[5px] overflow-hidden rounded-full bg-[#E8E2DA]">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${(rating / 10) * 100}%` }}
           transition={{ delay: 0.3, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          style={{ height: "100%", background: `linear-gradient(to right, ${color}90, ${color})`, borderRadius: 99 }}
+          className="h-full rounded-full"
+          style={{ background: `linear-gradient(to right, ${color}90, ${color})` }}
         />
       </div>
     </div>
   );
 }
 
-// ─── History strip ────────────────────────────────────────────────────────────
-interface HistoryItem {
-  name: string;
-  date: string;
-}
-
-const TOP_BUTCHERED_NAMES = [
-  { original: "Srinivasan", cup: "Serena Vision" },
-  { original: "Lakshmi", cup: "Lush Me" },
-  { original: "Xochitl", cup: "So Chill" },
-  { original: "Bhargavi", cup: "Barbie" },
-  { original: "Yasodha", cup: "Yasoda" },
-  { original: "Nguyen", cup: "Win" },
-  { original: "Karthikeyan", cup: "Car Ticket Ian" },
-  { original: "Saoirse", cup: "Sersha" },
-  { original: "Prudhvi", cup: "Broody" },
-  { original: "Siobhan", cup: "Chevon" },
-];
-
-interface HistoryStripProps {
+function HistoryStrip({
+  history,
+  onSelect,
+  onClear,
+}: {
   history: HistoryItem[];
   onSelect: (name: string) => void;
   onClear: () => void;
-}
-
-function HistoryStrip({ history, onSelect, onClear }: HistoryStripProps) {
+}) {
   if (!history.length) return null;
+
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-      style={{ position: "relative" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <span style={{ fontSize: 10, fontWeight: 700, color: "#B0A89E", letterSpacing: "0.1em", textTransform: "uppercase" }}>Recent cups</span>
-        <button onClick={onClear} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 10, fontWeight: 700, color: "#C0B8B0", textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "inherit" }}>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+      <div className="mb-2.5 flex items-center justify-between">
+        <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#B0A89E]">
+          Recent cups
+        </span>
+        <button
+          onClick={onClear}
+          className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.06em] text-[#C0B8B0]"
+        >
           Clear queue
         </button>
       </div>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      <div className="flex flex-wrap gap-2">
         {history.map((h, i) => (
-          <motion.button key={i}
+          <motion.button
+            key={`${h.name}-${i}`}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => onSelect(h.name)}
-            style={{
-              padding: "7px 16px", borderRadius: 99,
-              background: "white", border: "1.5px solid #E4DDD5",
-              fontSize: 13, fontWeight: 600, color: BROWN,
-              cursor: "pointer", fontFamily: "inherit",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-              transition: "border-color 0.15s",
-            }}
-            onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => e.currentTarget.style.borderColor = G}
-            onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => e.currentTarget.style.borderColor = "#E4DDD5"}
+            className="cursor-pointer rounded-full border border-[#E4DDD5] bg-white px-4 py-1.5 text-[13px] font-semibold text-[#6F4E37] shadow-[0_1px_4px_rgba(0,0,0,0.06)] transition-colors hover:border-[#00704A]"
           >
             {h.name}
           </motion.button>
@@ -348,42 +286,24 @@ function TopButcheredList() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.28 }}
-      className="card"
-      style={{ marginTop: 12, padding: "12px 14px 11px", borderColor: "#DCD2C7", background: CREAM, boxShadow: "0 1px 10px rgba(0,0,0,0.03)" }}
+      className="mt-3 rounded-3xl border border-[#DCD2C7] bg-[#F2EFE9] px-3.5 pb-2.5 pt-3 shadow-[0_1px_10px_rgba(0,0,0,0.03)]"
     >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-        <span style={{ fontSize: 10, fontWeight: 700, color: "#B0A89E", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+      <div className="mb-2 flex items-center justify-between">
+        <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#B0A89E]">
           Barista&apos;s wall of shame
         </span>
-        <span style={{ fontSize: 10, fontWeight: 700, color: "#9D8F84", letterSpacing: "0.06em", textTransform: "uppercase" }}>Top 10</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.06em] text-[#9D8F84]">Top 10</span>
       </div>
 
-      <div style={{ display: "grid", gap: 5 }}>
+      <div className="grid gap-[5px]">
         {TOP_BUTCHERED_NAMES.map((entry, i) => (
-          <div
-            key={`${entry.original}-${entry.cup}`}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 5,
-              padding: "2px 0",
-              width: "100%",
-            }}
-          >
-            <span style={{ fontSize: 10, fontWeight: 700, color: "#B3A497", minWidth: 14 }}>{i + 1}.</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: B, whiteSpace: "nowrap" }}>
-              {entry.original}
+          <div key={`${entry.original}-${entry.cup}`} className="flex w-full items-center gap-[5px] py-0.5">
+            <span className="min-w-[14px] text-[10px] font-bold text-[#B3A497]">{i + 1}.</span>
+            <span className="whitespace-nowrap text-[13px] font-semibold text-[#1E3932]">{entry.original}</span>
+            <span className="text-[11px] font-bold text-[#B9AB9E]">→</span>
+            <span className="mt-[1px] whitespace-nowrap text-[20px] leading-none text-[#6F4E37] [font-family:'Caveat','Permanent_Marker',cursive]">
+              {entry.cup}
             </span>
-            <span style={{ fontSize: 11, fontWeight: 700, color: "#B9AB9E" }}>→</span>
-            <span style={{
-              fontFamily: "'Caveat', 'Permanent Marker', cursive",
-              fontSize: 20,
-              lineHeight: 1,
-              color: BROWN,
-              transform: "rotate(-2deg)",
-              whiteSpace: "nowrap",
-              marginTop: 1,
-            }}>{entry.cup}</span>
           </div>
         ))}
       </div>
@@ -391,19 +311,17 @@ function TopButcheredList() {
   );
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
-interface Prediction {
-  starbuckdName: string;
-  struggleRating: number | string;
-  rationale: string;
-  safeAlias: string;
-}
-
-declare global {
-  interface Window {
-    webkitSpeechRecognition?: any;
-    SpeechRecognition?: any;
-  }
+function Card({ children, delay = 0.05, className = "" }: { children: ReactNode; delay?: number; className?: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={`overflow-hidden rounded-3xl border border-[rgba(0,0,0,0.06)] bg-white shadow-[0_4px_32px_rgba(0,0,0,0.07),0_1px_3px_rgba(0,0,0,0.04)] ${className}`}
+    >
+      {children}
+    </motion.div>
+  );
 }
 
 function App() {
@@ -416,6 +334,7 @@ function App() {
   const [loadingLineIndex, setLoadingLineIndex] = useState(0);
   const [speechSupported, setSpeechSupported] = useState(false);
   const [isListening, setIsListening] = useState(false);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const speechRef = useRef<any>(null);
 
@@ -428,7 +347,12 @@ function App() {
   ];
 
   useEffect(() => {
-    try { const s = localStorage.getItem("sbhist"); if (s) setHistory(JSON.parse(s)); } catch { }
+    try {
+      const s = localStorage.getItem("sbhist");
+      if (s) setHistory(JSON.parse(s));
+    } catch {
+      // ignore parse errors
+    }
     inputRef.current?.focus();
   }, []);
 
@@ -457,7 +381,11 @@ function App() {
       recognition.onstart = null;
       recognition.onend = null;
       recognition.onerror = null;
-      try { recognition.stop(); } catch { }
+      try {
+        recognition.stop();
+      } catch {
+        // noop
+      }
     };
   }, []);
 
@@ -465,13 +393,14 @@ function App() {
     if (stage !== "loading") return;
     setLoadingLineIndex(0);
     const id = window.setInterval(() => {
-      setLoadingLineIndex(prev => (prev + 1) % loadingLines.length);
+      setLoadingLineIndex((prev) => (prev + 1) % loadingLines.length);
     }, 2200);
     return () => window.clearInterval(id);
   }, [stage, loadingLines.length]);
 
   const predict = useCallback(async (name: string) => {
     if (!name.trim()) return;
+
     setStage("loading");
     setError("");
     setPrediction(null);
@@ -485,10 +414,12 @@ function App() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
+
       setPrediction(data);
       setStage("result");
-      setHistory(prev => {
-        const next = [{ name, date: new Date().toISOString() }, ...prev.filter(h => h.name !== name)].slice(0, 8);
+
+      setHistory((prev) => {
+        const next = [{ name, date: new Date().toISOString() }, ...prev.filter((h) => h.name !== name)].slice(0, 8);
         localStorage.setItem("sbhist", JSON.stringify(next));
         return next;
       });
@@ -518,9 +449,8 @@ function App() {
     if (!recognition) return;
 
     try {
-      if (isListening) {
-        recognition.stop();
-      } else {
+      if (isListening) recognition.stop();
+      else {
         setError("");
         recognition.start();
       }
@@ -530,518 +460,236 @@ function App() {
   };
 
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,900&family=Caveat:wght@700&family=Inter:wght@400;500;600;700&display=swap');
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { height: 100%; }
-        body {
-          background: ${CREAM};
-          font-family: 'Inter', sans-serif;
-          -webkit-font-smoothing: antialiased;
-          min-height: 100vh;
-        }
-        ::selection { background: ${G}30; }
+    <div className="relative min-h-screen bg-[#1E3932] px-5 py-8 [font-family:'Inter',sans-serif] antialiased">
+      <div className="relative z-[1] mx-auto w-full max-w-[480px]">
+        <motion.div
+          onClick={stage === "result" ? reset : undefined}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-10 select-none text-center"
+        >
+          <div className="text-[clamp(58px,15vw,86px)] font-bold leading-[0.92] tracking-[0.2px] text-[#E6D5C6] [font-family:'Caveat','Comic_Sans_MS','Trebuchet_MS',cursive] [text-shadow:0_1px_5px_rgba(0,0,0,0.12)]">
+            Starbuck<span className="ml-[-4px] text-[#B58963]">&apos;d</span>
+          </div>
+          <p className="mt-2.5 text-[13px] font-semibold tracking-[0.02em] text-[#C9C0B7]">
+            I&apos;ll butcher your name, hand you a safer alias, and we&apos;ll never speak of this again.
+          </p>
+        </motion.div>
 
-        .root {
-          min-height: 100vh;
-          display: grid;
-          place-items: center;
-          padding: 32px 20px;
-          position: relative;
-          overflow: hidden;
-        }
-        /* Background blobs */
-        .root::before {
-          content: '';
-          position: fixed; inset: 0; pointer-events: none;
-          background:
-            radial-gradient(ellipse 60% 50% at 85% 10%, rgba(0,112,74,0.08) 0%, transparent 70%),
-            radial-gradient(ellipse 50% 40% at 10% 90%, rgba(111,78,55,0.07) 0%, transparent 70%);
-        }
-
-        .wrap {
-          width: 100%;
-          max-width: 480px;
-          position: relative;
-          z-index: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 0;
-        }
-
-        /* Logo */
-        .logo {
-          text-align: center;
-          margin-bottom: 40px;
-          cursor: pointer;
-          user-select: none;
-        }
-        .logo-text {
-          font-family: 'Caveat', 'Comic Sans MS', 'Trebuchet MS', cursive;
-          font-size: clamp(58px, 15vw, 86px);
-          font-weight: 700;
-          color: #E6D5C6;
-          line-height: 0.92;
-          letter-spacing: 0.2px;
-          text-shadow: 0 1px 5px rgba(0, 0, 0, 0.12);
-        }
-        .logo-accent { color: ${G}; }
-        .logo-sub {
-          margin-top: 10px;
-          font-size: 13px;
-          font-weight: 600;
-          color: #C9C0B7;
-          letter-spacing: 0.02em;
-        }
-
-        /* Input area */
-        .input-wrap {
-          position: relative;
-          margin-bottom: 16px;
-        }
-        .main-input {
-          width: 100%;
-          padding: 20px 128px 20px 24px;
-          font-size: 18px;
-          font-weight: 600;
-          font-family: 'Inter', sans-serif;
-          color: ${B};
-          background: white;
-          border: 2px solid transparent;
-          border-radius: 20px;
-          outline: none;
-          box-shadow: 0 2px 20px rgba(0,0,0,0.08), 0 0 0 1px #E4DDD5;
-          transition: box-shadow 0.2s, border-color 0.2s;
-          appearance: none;
-          -webkit-appearance: none;
-        }
-        .main-input::placeholder { color: #C0B8B0; font-weight: 400; }
-        .main-input:focus {
-          border-color: ${G};
-          box-shadow: 0 2px 20px rgba(0,0,0,0.08), 0 0 0 4px rgba(0,112,74,0.12);
-        }
-        .go-btn {
-          position: absolute;
-          right: 10px; top: 50%;
-          transform: translateY(-50%);
-          width: 50px; height: 50px;
-          border-radius: 14px;
-          background: ${G};
-          border: none;
-          cursor: pointer;
-          display: flex; align-items: center; justify-content: center;
-          color: white;
-          transition: background 0.15s, transform 0.1s;
-          box-shadow: 0 4px 14px rgba(0,112,74,0.35);
-        }
-        .go-btn:hover { background: #005C3B; }
-        .go-btn:active { transform: translateY(-50%) scale(0.92); }
-        .go-btn:disabled { background: #D0C8C0; box-shadow: none; cursor: not-allowed; }
-        .mic-btn {
-          position: absolute;
-          right: 66px; top: 50%;
-          transform: translateY(-50%);
-          width: 42px; height: 42px;
-          border-radius: 12px;
-          background: #F4F0EA;
-          border: 1.5px solid #DDD3C8;
-          cursor: pointer;
-          display: flex; align-items: center; justify-content: center;
-          color: #8D7A6A;
-          transition: all 0.15s;
-        }
-        .mic-btn:hover { border-color: ${G}; color: ${G}; background: #F6FBF9; }
-        .mic-btn:active { transform: translateY(-50%) scale(0.95); }
-        .mic-btn.active {
-          border-color: ${G};
-          color: white;
-          background: ${G};
-          box-shadow: 0 4px 14px rgba(0,112,74,0.25);
-        }
-
-        /* Error */
-        .error-bar {
-          padding: 12px 18px;
-          background: #FFF2F2;
-          border: 1.5px solid #FFD0D0;
-          border-radius: 14px;
-          color: #C0392B;
-          font-size: 13px;
-          font-weight: 600;
-          margin-bottom: 16px;
-        }
-
-        /* Card base */
-        .card {
-          background: white;
-          border-radius: 24px;
-          border: 1.5px solid rgba(0,0,0,0.06);
-          box-shadow: 0 4px 32px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
-          overflow: hidden;
-        }
-
-        /* Result section */
-        .result-grid {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        /* Name reveal card */
-        .name-card {
-          padding: 28px;
-          position: relative;
-          background: ${CREAM};
-          border-color: #DCD2C7;
-          box-shadow: 0 2px 14px rgba(0,0,0,0.04);
-        }
-        .names-row {
-          display: grid;
-          grid-template-columns: 1fr 52px 1fr;
-          column-gap: 10px;
-          align-items: start;
-          margin-bottom: 8px;
-        }
-        .name-col {
-          min-width: 0;
-        }
-        .name-label {
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          color: #B0A89E;
-          margin-bottom: 6px;
-        }
-        .name-label.right {
-          text-align: left;
-        }
-        .name-val {
-          font-family: 'Playfair Display', Georgia, serif;
-          font-size: clamp(24px, 6vw, 32px);
-          font-weight: 900;
-          line-height: 1.05;
-          color: ${B};
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-        .name-val.left {
-          text-align: left;
-        }
-        .name-val.right {
-          text-align: left;
-        }
-        .name-val.butchered {
-          color: ${BROWN};
-          font-family: 'Caveat', 'Permanent Marker', cursive;
-          font-size: clamp(24px, 6vw, 32px);
-          font-weight: 800;
-          font-style: normal;
-          letter-spacing: 0;
-        }
-        .arrow-div {
-          width: 52px;
-          height: auto;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 24px;
-          color: #D0C8C0;
-          transform: translateY(14px);
-        }
-
-        /* Alias banner */
-        .alias-banner {
-          background: ${G};
-          border-radius: 20px;
-          padding: 28px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-          position: relative;
-          overflow: hidden;
-        }
-        .alias-banner::after {
-          content: '';
-          position: absolute;
-          top: -50%; right: -10%;
-          width: 50%; height: 200%;
-          background: rgba(255,255,255,0.07);
-          border-radius: 50%;
-          pointer-events: none;
-        }
-        .alias-text {
-          font-family: 'Playfair Display', Georgia, serif;
-          font-size: clamp(34px, 9vw, 50px);
-          font-weight: 900;
-          color: white;
-          line-height: 1;
-          letter-spacing: -1px;
-        }
-        .alias-cup { flex-shrink: 0; width: 90px; }
-
-        /* Rationale */
-        .rationale-card {
-          padding: 22px 26px;
-          background: ${CREAM};
-          border-color: #DCD2C7;
-          box-shadow: 0 2px 14px rgba(0,0,0,0.04);
-        }
-        .rationale-text {
-          font-size: 15px;
-          line-height: 1.7;
-          color: #5A4E46;
-          font-weight: 400;
-        }
-
-        /* Bottom row */
-        .bottom-row {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-top: 8px;
-        }
-        .retry-btn {
-          display: flex; align-items: center; gap: 8px;
-          padding: 11px 22px;
-          border-radius: 99px;
-          background: white;
-          border: 1.5px solid #E4DDD5;
-          font-size: 13px;
-          font-weight: 600;
-          color: #8A8078;
-          cursor: pointer;
-          font-family: inherit;
-          transition: all 0.15s;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-        }
-        .retry-btn:hover {
-          border-color: ${G};
-          color: ${G};
-          box-shadow: 0 2px 10px rgba(0,112,74,0.12);
-        }
-
-        /* Loading cup bounce */
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-        .float { animation: float 1.5s ease-in-out infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        @media (max-width: 420px) {
-          .alias-banner { flex-direction: column; text-align: center; }
-          .alias-cup { display: none; }
-          .logo-text { font-size: 52px; }
-          .name-values-row { align-items: start; }
-          .name-val {
-            font-size: 22px;
-            white-space: normal;
-            overflow: visible;
-            text-overflow: clip;
-            line-height: 1.12;
-            word-break: break-word;
-          }
-          .name-val.butchered {
-            font-size: 22px;
-          }
-        }
-      `}</style>
-
-      <div className="root">
-        <div className="wrap">
-          {/* Logo */}
-          <motion.div
-            className="logo"
-            onClick={stage === "result" ? reset : undefined}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="logo-text">
-              {/* <Coffee className="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 text-[#00704A] flex-shrink-0" /> */}
-              Starbuck<span className="text-[#B58963] ml-[-4px]">&apos;d</span>
-            </div>
-            <p className="logo-sub">I&apos;ll butcher your name, hand you a safer alias, and we&apos;ll never speak of this again.</p>
-          </motion.div>
-
-          {/* Input */}
-          <AnimatePresence>
-            {stage !== "result" && (
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -16, scale: 0.97 }}
-                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {error && <div className="error-bar">⚠ {error}</div>}
-                <form onSubmit={submit} className="input-wrap">
-                  <input
-                    ref={inputRef}
-                    className="main-input"
-                    type="text"
-                    value={inputVal}
-                    onChange={e => setInputVal(e.target.value)}
-                    placeholder="Drop your name. I’ll do my worst."
-                    autoComplete="off"
-                    autoCorrect="off"
-                    spellCheck={false}
-                  />
-                  {speechSupported && (
-                    <button
-                      type="button"
-                      className={`mic-btn ${isListening ? "active" : ""}`}
-                      onClick={toggleListening}
-                      aria-label={isListening ? "Stop listening" : "Speak your name"}
-                      title={isListening ? "Stop listening" : "Speak your name"}
-                    >
-                      {isListening ? <MicOff size={16} /> : <Mic size={16} />}
-                    </button>
-                  )}
-                  <button className="go-btn" type="submit" disabled={!inputVal.trim() || stage === "loading"}>
-                    {stage === "loading"
-                      ? <RefreshCw size={18} style={{ animation: "spin 0.7s linear infinite" }} />
-                      : <ArrowUp size={18} />
-                    }
-                  </button>
-                </form>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Loading */}
-          <AnimatePresence>
-            {stage === "loading" && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.35 }}
-                style={{ textAlign: "center", padding: "40px 0", display: "flex", flexDirection: "column", alignItems: "center" }}
-              >
-                <Steam active={true} />
-                <div className="float" style={{ display: "inline-block" }}>
-                  <Cup starbuckdName="???" />
+        <AnimatePresence>
+          {stage !== "result" && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16, scale: 0.97 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {error && (
+                <div className="mb-4 rounded-[14px] border border-[#FFD0D0] bg-[#FFF2F2] px-[18px] py-3 text-[13px] font-semibold text-[#C0392B]">
+                  ⚠ {error}
                 </div>
-                <p style={{ marginTop: 16, fontSize: 13, color: "#A89E94", fontWeight: 500 }}>
-                  {loadingLines[loadingLineIndex]}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              )}
 
-          {/* Results */}
-          <AnimatePresence mode="wait">
-            {stage === "result" && prediction && (
-              <motion.div
-                key="result"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="result-grid"
-              >
-                {/* Name comparison + difficulty */}
-                <TiltCard className="card name-card" delay={0.05}>
-                  <div className="names-row">
-                    <div className="name-col">
-                      <div className="name-label">You said</div>
-                      <div className="name-val left">{submittedName}</div>
+              <form onSubmit={submit} className="relative mb-4">
+                <input
+                  ref={inputRef}
+                  className="w-full rounded-[20px] border-2 border-transparent bg-white px-6 py-5 pr-32 text-lg font-semibold text-[#1E3932] shadow-[0_2px_20px_rgba(0,0,0,0.08),0_0_0_1px_#E4DDD5] outline-none transition placeholder:font-normal placeholder:text-[#C0B8B0] focus:border-[#00704A] focus:shadow-[0_2px_20px_rgba(0,0,0,0.08),0_0_0_4px_rgba(0,112,74,0.12)]"
+                  type="text"
+                  value={inputVal}
+                  onChange={(e) => setInputVal(e.target.value)}
+                  placeholder="Drop your name. I’ll do my worst."
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                />
+
+                {speechSupported && (
+                  <button
+                    type="button"
+                    className={`absolute right-[66px] top-1/2 flex h-[42px] w-[42px] -translate-y-1/2 items-center justify-center rounded-xl border border-[#DDD3C8] bg-[#F4F0EA] text-[#8D7A6A] transition hover:border-[#00704A] hover:bg-[#F6FBF9] hover:text-[#00704A] active:scale-95 ${isListening ? "border-[#00704A] bg-[#00704A] text-white shadow-[0_4px_14px_rgba(0,112,74,0.25)]" : ""}`}
+                    onClick={toggleListening}
+                    aria-label={isListening ? "Stop listening" : "Speak your name"}
+                    title={isListening ? "Stop listening" : "Speak your name"}
+                  >
+                    {isListening ? <MicOff size={16} /> : <Mic size={16} />}
+                  </button>
+                )}
+
+                <button
+                  className="absolute right-2.5 top-1/2 flex h-[50px] w-[50px] -translate-y-1/2 items-center justify-center rounded-[14px] bg-[#00704A] text-white shadow-[0_4px_14px_rgba(0,112,74,0.35)] transition hover:bg-[#005C3B] active:scale-95 disabled:cursor-not-allowed disabled:bg-[#D0C8C0] disabled:shadow-none"
+                  type="submit"
+                  disabled={!inputVal.trim() || stage === "loading"}
+                >
+                  {stage === "loading" ? (
+                    <RefreshCw size={18} className="animate-spin" />
+                  ) : (
+                    <ArrowUp size={18} />
+                  )}
+                </button>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {stage === "loading" && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.35 }}
+              className="flex flex-col items-center py-10 text-center"
+            >
+              <Steam active={true} />
+              <div className="animate-[float_1.5s_ease-in-out_infinite]">
+                <Cup starbuckdName="???" />
+              </div>
+              <p className="mt-4 text-[13px] font-medium text-[#A89E94]">
+                {loadingLines[loadingLineIndex]}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence mode="wait">
+          {stage === "result" && prediction && (
+            <motion.div
+              key="result"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col gap-3"
+            >
+              <Card delay={0.05} className="border-[#DCD2C7] bg-[#F2EFE9] px-7 py-7 shadow-[0_2px_14px_rgba(0,0,0,0.04)]">
+                <div className="mb-2 grid grid-cols-[1fr_52px_1fr] items-start gap-x-2.5">
+                  <div className="min-w-0">
+                    <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#B0A89E]">
+                      You said
                     </div>
-
-                    <div className="arrow-div">→</div>
-
-                    <div className="name-col">
-                      <div className="name-label right">I heard</div>
-                      <div className="name-val butchered right">{prediction.starbuckdName}</div>
+                    <div className="whitespace-nowrap text-left font-serif text-[clamp(24px,6vw,32px)] font-black leading-[1.05] text-[#1E3932] sm:whitespace-nowrap">
+                      {submittedName}
                     </div>
                   </div>
-                  <DifficultyMeter rating={Number(prediction.struggleRating)} />
-                </TiltCard>
 
-                {/* Alias banner with mini cup */}
-                <TiltCard delay={0.12}>
-                  <div className="alias-banner">
-                    <div>
-                      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>
-                        ✦ Your coffee safe alias
-                      </div>
-                      <div className="alias-text">{prediction.safeAlias}</div>
-                      <div style={{ marginTop: 8, fontSize: 12, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>
-                        Because some battles are not worth fighting over coffee.
-                      </div>
+                  <div className="flex translate-y-[14px] items-center justify-center text-2xl text-[#D0C8C0]">→</div>
+
+                  <div className="min-w-0">
+                    <div className="mb-1.5 text-left text-[10px] font-bold uppercase tracking-[0.1em] text-[#B0A89E]">
+                      I heard
                     </div>
-                    <div className="alias-cup">
+                    <div className="whitespace-nowrap text-left text-[clamp(24px,6vw,32px)] font-extrabold leading-[1.05] text-[#6F4E37] [font-family:'Caveat','Permanent_Marker',cursive] sm:whitespace-nowrap">
+                      {prediction.starbuckdName}
+                    </div>
+                  </div>
+                </div>
+
+                <DifficultyMeter rating={Number(prediction.struggleRating)} />
+              </Card>
+
+              <Card delay={0.12} className="border-[#0C5F41] bg-gradient-to-br from-[#00704A] via-[#006241] to-[#005236] p-0 shadow-[0_6px_24px_rgba(0,67,45,0.35)]">
+                <div className="relative overflow-hidden rounded-[20px] px-7 py-7">
+                  <div className="relative z-10 flex items-center justify-between gap-4">
+                    <div className="max-w-[68%]">
+                    <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-white/60">
+                      ✦ Your coffee safe alias
+                    </div>
+                    <div className="font-serif text-[clamp(34px,9vw,50px)] font-black leading-none tracking-[-1px] text-white">
+                      {prediction.safeAlias}
+                    </div>
+                    <div className="mt-2 text-xs font-medium text-white/70">
+                      Because some battles are not worth fighting over coffee.
+                    </div>
+                  </div>
+                    <div className="relative z-10 flex w-[90px] shrink-0 flex-col items-center justify-center sm:w-[118px]">
                       <Steam active={true} compact={true} />
                       <Cup starbuckdName={prediction.safeAlias} />
                     </div>
                   </div>
-                </TiltCard>
-
-                {/* Rationale */}
-                <TiltCard className="card rationale-card" delay={0.2}>
-                  <Tag color={BROWN}>☕ My excuse</Tag>
-                  <p className="rationale-text" style={{ marginTop: 12 }}>
-                    {prediction.rationale}
-                  </p>
-                </TiltCard>
-
-                {/* Action row */}
-                <div className="bottom-row">
-                  <button className="retry-btn" onClick={reset}>
-                    <RotateCcw size={13} />
-                    Ruin another name
-                  </button>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              </Card>
 
-          {/* Idle empty state */}
-          <AnimatePresence>
-            {stage === "idle" && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ delay: 0.3 }}
-                style={{ textAlign: "center", padding: "32px 0 12px", display: "flex", flexDirection: "column", alignItems: "center" }}
-              >
-                <Steam active={false} />
-                <div style={{ opacity: 0.35 }}>
-                  <Cup starbuckdName="your name?" />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              <Card delay={0.2} className="border-[#DCD2C7] bg-[#F2EFE9] px-[26px] py-[22px] shadow-[0_2px_14px_rgba(0,0,0,0.04)]">
+                <span className="inline-flex items-center gap-[5px] rounded-full border border-[#6F4E3730] bg-[#6F4E3718] px-2.5 py-[3px] text-[10px] font-bold uppercase tracking-[0.08em] text-[#6F4E37]">
+                  ☕ Why butchered
+                </span>
+                <p className="mt-3 text-[15px] font-normal leading-[1.7] text-[#5A4E46]">
+                  {prediction.rationale}
+                </p>
+              </Card>
 
-          {/* History */}
-          {stage !== "loading" && (
-            <motion.div style={{ marginTop: 32 }}>
-              <HistoryStrip
-                history={history}
-                onSelect={name => { setInputVal(name); predict(name); }}
-                onClear={() => { setHistory([]); localStorage.removeItem("sbhist"); }}
-              />
-              <TopButcheredList />
+              <div className="mt-2 flex items-center justify-center">
+                <button
+                  className="flex cursor-pointer items-center gap-2 rounded-full border border-[#E4DDD5] bg-white px-[22px] py-[11px] text-[13px] font-semibold text-[#8A8078] shadow-[0_1px_4px_rgba(0,0,0,0.05)] transition hover:border-[#00704A] hover:text-[#00704A] hover:shadow-[0_2px_10px_rgba(0,112,74,0.12)]"
+                  onClick={reset}
+                >
+                  <RotateCcw size={13} />
+                  Ruin another name
+                </button>
+              </div>
             </motion.div>
           )}
-        </div>
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {stage === "idle" && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ delay: 0.3 }}
+              className="flex flex-col items-center pb-3 pt-8 text-center"
+            >
+              <div className="opacity-35">
+                <Cup starbuckdName="your name?" />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {stage !== "loading" && (
+          <motion.div className="mt-8">
+            <HistoryStrip
+              history={history}
+              onSelect={(name) => {
+                setInputVal(name);
+                predict(name);
+              }}
+              onClear={() => {
+                setHistory([]);
+                localStorage.removeItem("sbhist");
+              }}
+            />
+            <TopButcheredList />
+          </motion.div>
+        )}
       </div>
-    </>
+
+      <style jsx global>{`
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+      `}</style>
+    </div>
   );
 }
 
 export default function Home() {
   return (
-    <Suspense fallback={
-      <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", background: CREAM }}>
-        <RefreshCw size={24} style={{ color: G, animation: "spin 0.7s linear infinite" }} />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="grid min-h-screen place-items-center bg-[#1E3932]">
+          <RefreshCw size={24} className="animate-spin text-[#00704A]" />
+        </div>
+      }
+    >
       <App />
     </Suspense>
   );
