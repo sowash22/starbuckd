@@ -372,7 +372,7 @@ function TopButcheredList() {
           >
             <span style={{ fontSize: 10, fontWeight: 700, color: "#B3A497", minWidth: 14 }}>{i + 1}.</span>
             <span style={{ fontSize: 13, fontWeight: 600, color: B, whiteSpace: "nowrap" }}>
-                {entry.original}
+              {entry.original}
             </span>
             <span style={{ fontSize: 11, fontWeight: 700, color: "#B9AB9E" }}>→</span>
             <span style={{
@@ -690,6 +690,9 @@ function App() {
         .name-card {
           padding: 28px;
           position: relative;
+          background: ${CREAM};
+          border-color: #DCD2C7;
+          box-shadow: 0 2px 14px rgba(0,0,0,0.04);
         }
         .names-row {
           display: flex;
@@ -764,6 +767,9 @@ function App() {
         /* Rationale */
         .rationale-card {
           padding: 22px 26px;
+          background: ${CREAM};
+          border-color: #DCD2C7;
+          box-shadow: 0 2px 14px rgba(0,0,0,0.04);
         }
         .rationale-text {
           font-size: 15px;
@@ -928,11 +934,11 @@ function App() {
                   <div className="alias-banner">
                     <div>
                       <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>
-                        ✦ Emergency coffee alias
+                        ✦ Your coffee safe alias
                       </div>
                       <div className="alias-text">{prediction.safeAlias}</div>
                       <div style={{ marginTop: 8, fontSize: 12, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>
-                        Use this next time if you want coffee, not a spelling debate.
+                        Because some battles are not worth fighting over coffee.
                       </div>
                     </div>
                     <div className="alias-cup">
