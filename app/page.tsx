@@ -365,12 +365,13 @@ function TopButcheredList() {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 8,
-              padding: "3px 0",
+              gap: 5,
+              padding: "2px 0",
+              width: "100%",
             }}
           >
-            <span style={{ fontSize: 10, fontWeight: 700, color: "#B3A497", minWidth: 16 }}>{i + 1}.</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: B, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: "#B3A497", minWidth: 14 }}>{i + 1}.</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: B, whiteSpace: "nowrap" }}>
                 {entry.original}
             </span>
             <span style={{ fontSize: 11, fontWeight: 700, color: "#B9AB9E" }}>→</span>
