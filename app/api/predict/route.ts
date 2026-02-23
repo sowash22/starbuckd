@@ -1,12 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-
-interface PredictionTask {
-    provider: 'nvidia' | 'gemini';
-    model: string;
-}
 
 function normalizeNameKey(value: string) {
     return value.toLowerCase().replace(/[^a-z]/g, "");
@@ -43,8 +35,15 @@ function validatePredictionResult(inputName: string, raw: any) {
     };
 }
 
-async function runPrediction(name: string, task: PredictionTask, signal: AbortSignal) {
-    const prompt = `You are a world-weary Starbucks barista — underpaid, overcaffeinated, and profoundly indifferent to the correct spelling of names. You've seen things. You've written "Khaleesi" as "Kaleesy." You once wrote "Bob" as "Bop" and you stand by it.
+export async function POST(req: Request) {
+    try {
+        const { name } = await req.json();
+
+        if (!name) {
+            return NextResponse.json({ error: "Name is required" }, { status: 400 });
+        }
+
+        const prompt = `You are a world-weary Starbucks barista — underpaid, overcaffeinated, and profoundly indifferent to the correct spelling of names. You've seen things. You've written "Khaleesi" as "Kaleesy." You once wrote "Bob" as "Bop" and you stand by it.
 
 INPUT NAME: "${name}"
 
@@ -103,121 +102,54 @@ RETURN FORMAT — EXACTLY THIS, NO EXTRAS:
   "struggleRating": 1
 }`;
 
-    if (task.provider === 'nvidia') {
-        const apiKey = process.env.NVIDIA_API_KEY;
-        const apiUrl = process.env.NVIDIA_API_URL || "https://integrate.api.nvidia.com/v1/chat/completions";
+        const apiUrl = process.env.BACKEND_API_URL || "https://backend-server-fast-1.vercel.app/v1/chat/completions";
+        const apiKey = process.env.CLIENT_API_KEY;
 
-        if (!apiKey) throw new Error("NVIDIA_API_KEY not found");
+        if (!apiKey) {
+            throw new Error("CLIENT_API_KEY is not configured");
+        }
+
+        console.log(`🚀 Requesting prediction for "${name}" from LLM Racing API...`);
 
         const response = await fetch(apiUrl, {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${apiKey}`,
+                "X-Client-ID": "starbuckd",
                 "Content-Type": "application/json",
                 "Accept": "application/json",
             },
             body: JSON.stringify({
-                model: task.model,
                 messages: [{ role: "user", content: prompt }],
-                max_tokens: 1024,
-                temperature: 1.0,
-                top_p: 1.0,
                 stream: false,
+                temperature: 1.0,
             }),
-            signal: signal
         });
 
         if (!response.ok) {
-            const errorBody = await response.text();
-            throw new Error(`Nvidia API error (${task.model}): ${response.status} ${errorBody}`);
+            const errorText = await response.text();
+            throw new Error(`Proxy API error: ${response.status} ${errorText}`);
         }
 
         const data = await response.json();
         const content = data.choices[0].message.content;
-        const parsed = JSON.parse(content.replace(/```json|```/g, "").trim());
-        return { ...validatePredictionResult(name, parsed), provider: `nvidia (${task.model})` };
-    } else {
-        const model = genAI.getGenerativeModel({ model: task.model });
 
-        // Gemini SDK doesn't natively support AbortSignal in generateContent easily, 
-        // but we can wrap it in a promise that rejects if the signal is aborted
-        const predictionPromise = (async () => {
-            const result = await model.generateContent(prompt);
-            const text = (await result.response).text();
-            const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
-            return { ...validatePredictionResult(name, parsed), provider: `gemini (${task.model})` };
-        })();
+        // Handle potential markdown backticks in response
+        const cleanContent = content.replace(/```json|```/g, "").trim();
+        const parsed = JSON.parse(cleanContent);
 
-        const abortPromise = new Promise((_, reject) => {
-            if (signal.aborted) {
-                reject(new Error("Aborted"));
-            }
-            signal.addEventListener("abort", () => reject(new Error("Aborted")));
+        const validated = validatePredictionResult(name, parsed);
+
+        return NextResponse.json({
+            ...validated,
+            provider: data.model || "llm-race"
         });
 
-        return await Promise.race([predictionPromise, abortPromise]);
-    }
-}
-
-export async function POST(req: Request) {
-    try {
-        const { name } = await req.json();
-
-        if (!name) {
-            return NextResponse.json({ error: "Name is required" }, { status: 400 });
-        }
-
-        const controller = new AbortController();
-        const signal = controller.signal;
-
-        const tasks: PredictionTask[] = [
-            { provider: 'gemini', model: process.env.GOOGLE_MODEL_1 || "gemini-1.5-flash-lite" },
-            { provider: 'gemini', model: process.env.GOOGLE_MODEL_2 || "gemini-1.5-flash" },
-            { provider: 'gemini', model: process.env.GOOGLE_MODEL_4 || "gemini-2.0-flash-lite" },
-            { provider: 'gemini', model: process.env.GOOGLE_MODEL_5 || "gemini-2.0-flash" },
-            { provider: 'nvidia', model: process.env.NVIDIA_MODEL_1 || "moonshotai/kimi-k2.5" },
-            { provider: 'nvidia', model: process.env.NVIDIA_MODEL_2 || "nvidia/nemotron-3-nano-30b-a3b" },
-            { provider: 'nvidia', model: process.env.NVIDIA_MODEL_3 || "deepseek-ai/deepseek-v3.2" },
-        ] as const;
-
-        console.log(`🚀 Starting parallel race for "${name}" across ${tasks.length} models...`);
-
-        // We want the first one to succeed
-        const executeTask = async (task: PredictionTask) => {
-            try {
-                const startTime = Date.now();
-                const result = await runPrediction(name, task, signal);
-                const duration = Date.now() - startTime;
-
-                if (!signal.aborted) {
-                    console.log(`✅ WINNER: ${task.provider} (${task.model}) in ${duration}ms`);
-                    controller.abort(); // Cancel others once we have a result
-                    return result;
-                }
-                throw new Error("Aborted");
-            } catch (err: any) {
-                if (err.name === 'AbortError' || err.message === 'Aborted') {
-                    throw err;
-                }
-                console.error(`❌ Task failed (${task.provider} - ${task.model}):`, err.message);
-                throw err;
-            }
-        };
-
-        try {
-            // Promise.any waits for the first fulfilled promise
-            const firstResult = await Promise.any(tasks.map(executeTask));
-            return NextResponse.json(firstResult);
-        } catch (aggregateError: any) {
-            console.error("All providers failed:", aggregateError);
-            return NextResponse.json({
-                error: "The baristas are all on strike (All models failed).",
-                details: aggregateError.errors?.map((e: any) => e.message) || [aggregateError.message]
-            }, { status: 500 });
-        }
-
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error in prediction route:", error);
-        return NextResponse.json({ error: "Failed to fetch prediction" }, { status: 500 });
+        return NextResponse.json({
+            error: "The baristas are all on strike (API Failure).",
+            details: error.message
+        }, { status: 500 });
     }
 }
