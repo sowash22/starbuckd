@@ -37,7 +37,7 @@ interface HistoryItem {
   date: string;
 }
 
-const TOP_BUTCHERED_NAMES = [
+const ALL_BUTCHERED_NAMES = [
   { original: "Srinivasan", cup: "Serena Vision" },
   { original: "Lakshmi", cup: "Lush Me" },
   { original: "Xochitl", cup: "So Chill" },
@@ -48,6 +48,36 @@ const TOP_BUTCHERED_NAMES = [
   { original: "Saoirse", cup: "Sersha" },
   { original: "Prudhvi", cup: "Broody" },
   { original: "Siobhan", cup: "Chevon" },
+  { original: "Aishwarya", cup: "Ash Wednesday" },
+  { original: "Priyanka", cup: "Pre-Yanker" },
+  { original: "Abhishek", cup: "Adobe Check" },
+  { original: "Aniruddha", cup: "Animated" },
+  { original: "Venkatesh", cup: "V-Neck Cash" },
+  { original: "Keerthana", cup: "Keyana" },
+  { original: "Niamh", cup: "Nee-Am" },
+  { original: "Aoife", cup: "Ee-Fee" },
+  { original: "Caoimhe", cup: "Cam-Hee" },
+  { original: "Oisin", cup: "Ocean" },
+  { original: "Maitreyi", cup: "My Tray" },
+  { original: "Siddharth", cup: "See Dart" },
+  { original: "Vishwanathan", cup: "Wish Nathan" },
+  { original: "Jyotsna", cup: "Jot-Sna" },
+  { original: "Kshama", cup: "Shama" },
+  { original: "Quetzalli", cup: "Pretzel-Lee" },
+  { original: "Ximena", cup: "Ex-Mena" },
+  { original: "Bjorn", cup: "B-Jordan" },
+  { original: "Thien", cup: "Thin" },
+  { original: "Gwang", cup: "Gong" },
+  { original: "Priti", cup: "Pretty" },
+  { original: "Subhash", cup: "Soup-Hash" },
+  { original: "Rajesh", cup: "Rage" },
+  { original: "Sridhar", cup: "Shredder" },
+  { original: "Aaditya", cup: "Addy" },
+  { original: "Deepali", cup: "Deep Ali" },
+  { original: "Meghana", cup: "Meg-Anna" },
+  { original: "Tenzin", cup: "Ten-Sin" },
+  { original: "Phuc", cup: "Fook" },
+  { original: "Dung", cup: "Done" },
 ];
 
 declare global {
@@ -283,6 +313,15 @@ function HistoryStrip({
 }
 
 function TopButcheredList() {
+  const [displayNames, setDisplayNames] = useState<{ original: string; cup: string }[]>([]);
+
+  useEffect(() => {
+    const shuffled = [...ALL_BUTCHERED_NAMES].sort(() => 0.5 - Math.random()).slice(0, 10);
+    setDisplayNames(shuffled);
+  }, []);
+
+  if (displayNames.length === 0) return null;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -298,7 +337,7 @@ function TopButcheredList() {
       </div>
 
       <div className="grid gap-[5px]">
-        {TOP_BUTCHERED_NAMES.map((entry, i) => (
+        {displayNames.map((entry, i) => (
           <div key={`${entry.original}-${entry.cup}`} className="flex w-full items-center gap-[5px] py-0.5">
             <span className="min-w-[14px] text-[10px] font-bold text-[#B3A497]">{i + 1}.</span>
             <span className="whitespace-nowrap text-[15px] font-semibold text-[#1E3932]">

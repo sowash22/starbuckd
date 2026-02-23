@@ -103,7 +103,8 @@ RETURN FORMAT — EXACTLY THIS, NO EXTRAS:
 }`;
 
         const apiUrl = process.env.BACKEND_API_URL || "https://backend-server-fast-1.vercel.app/v1/chat/completions";
-        const apiKey = process.env.CLIENT_API_KEY;
+        const apiKey = process.env.CLIENT_API_KEY || "";
+        const clientId = process.env.CLIENT_ID || "starbuckd";
 
         if (!apiKey) {
             throw new Error("CLIENT_API_KEY is not configured");
@@ -115,7 +116,7 @@ RETURN FORMAT — EXACTLY THIS, NO EXTRAS:
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${apiKey}`,
-                "X-Client-ID": "starbuckd",
+                "X-Client-ID": clientId,
                 "Content-Type": "application/json",
                 "Accept": "application/json",
             },
