@@ -1,5 +1,25 @@
 import { NextResponse } from "next/server";
 
+const INFERENCE_TIMEOUT_MS = 12_000;
+
+type CompletionResponse = {
+    model?: string;
+    choices?: Array<{ message?: { content?: unknown } }>;
+};
+
+function v2Endpoint(): string | null {
+    const raw = process.env.BACKEND_API_URL?.trim();
+    if (!raw) return null;
+    try {
+        const url = new URL(raw);
+        const path = url.pathname.replace(/\/$/, "");
+        if (path !== "/v2/chat/completions" || (url.protocol !== "https:" && url.hostname !== "localhost" && url.hostname !== "127.0.0.1")) return null;
+        return url.toString();
+    } catch {
+        return null;
+    }
+}
+
 function normalizeNameKey(value: string) {
     return value.toLowerCase().replace(/[^a-z]/g, "");
 }
@@ -102,12 +122,12 @@ RETURN FORMAT — EXACTLY THIS, NO EXTRAS:
   "struggleRating": 1
 }`;
 
-        const apiUrl = process.env.BACKEND_API_URL || "https://backend-server-fast-1.vercel.app/v1/chat/completions";
-        const apiKey = process.env.CLIENT_API_KEY || "";
-        const clientId = process.env.CLIENT_ID || "starbuckd";
+        const apiUrl = v2Endpoint();
+        const apiKey = process.env.CLIENT_API_KEY?.trim();
+        const provider = process.env.PROVIDER?.trim();
 
-        if (!apiKey) {
-            throw new Error("CLIENT_API_KEY is not configured");
+        if (!apiUrl || !apiKey) {
+            throw new Error("V2 inference API is not configured");
         }
 
         console.log(`🚀 Requesting prediction for "${name}" from LLM Racing API...`);
@@ -116,7 +136,7 @@ RETURN FORMAT — EXACTLY THIS, NO EXTRAS:
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${apiKey}`,
-                "X-Client-ID": clientId,
+                "X-Client-ID": process.env.CLIENT_ID?.trim() || "starbuckd",
                 "Content-Type": "application/json",
                 "Accept": "application/json",
             },
@@ -124,7 +144,11 @@ RETURN FORMAT — EXACTLY THIS, NO EXTRAS:
                 messages: [{ role: "user", content: prompt }],
                 stream: false,
                 temperature: 1.0,
+                max_tokens: 500,
+                ...(provider ? { provider } : {}),
             }),
+            cache: "no-store",
+            signal: AbortSignal.timeout(INFERENCE_TIMEOUT_MS),
         });
 
         if (!response.ok) {
@@ -132,8 +156,9 @@ RETURN FORMAT — EXACTLY THIS, NO EXTRAS:
             throw new Error(`Proxy API error: ${response.status} ${errorText}`);
         }
 
-        const data = await response.json();
-        const content = data.choices[0].message.content;
+        const data = await response.json() as CompletionResponse;
+        const content = data.choices?.[0]?.message?.content;
+        if (typeof content !== "string") throw new Error("Model returned no content");
 
         // Handle potential markdown backticks in response
         const cleanContent = content.replace(/```json|```/g, "").trim();

@@ -22,8 +22,11 @@ npm install
 2. Set up your environment variables in `.env.local`:
 
 ```env
-NVIDIA_API_KEY=your_key
-GEMINI_API_KEY=your_key
+BACKEND_API_URL=https://your-inference-api.example/v2/chat/completions
+CLIENT_API_KEY=your_client_key
+CLIENT_ID=starbuckd
+# Optional provider preference; v2 falls back to other available providers.
+PROVIDER=
 ```
 
 3. Run the development server:
