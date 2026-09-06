@@ -132,44 +132,54 @@ RETURN FORMAT — EXACTLY THIS, NO EXTRAS:
 
         console.log(`🚀 Requesting prediction for "${name}" from LLM Racing API...`);
 
-        const response = await fetch(apiUrl, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${apiKey}`,
-                "X-Client-ID": process.env.CLIENT_ID?.trim() || "starbuckd",
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-            },
-            body: JSON.stringify({
-                messages: [{ role: "user", content: prompt }],
-                stream: false,
-                temperature: 1.0,
-                max_tokens: 500,
-                ...(provider ? { provider } : {}),
-            }),
-            cache: "no-store",
-            signal: AbortSignal.timeout(INFERENCE_TIMEOUT_MS),
-        });
+        let lastError: Error | null = null;
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Proxy API error: ${response.status} ${errorText}`);
+        // One retry is cheaper than failing the request when a model emits malformed JSON.
+        for (let attempt = 1; attempt <= 2; attempt++) {
+            try {
+                const response = await fetch(apiUrl, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${apiKey}`,
+                        "X-Client-ID": process.env.CLIENT_ID?.trim() || "starbuckd",
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                    },
+                    body: JSON.stringify({
+                        messages: [{ role: "user", content: prompt }],
+                        ...(attempt === 1 ? { response_format: { type: "json_object" } } : {}),
+                        stream: false,
+                        temperature: 0.9,
+                        max_tokens: 700,
+                        ...(provider ? { provider } : {}),
+                    }),
+                    cache: "no-store",
+                    signal: AbortSignal.timeout(INFERENCE_TIMEOUT_MS),
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Proxy API error: ${response.status} ${errorText}`);
+                }
+
+                const data = await response.json() as CompletionResponse;
+                const content = data.choices?.[0]?.message?.content;
+                if (typeof content !== "string") throw new Error("Model returned no content");
+
+                const parsed = JSON.parse(content.replace(/```json|```/g, "").trim());
+                const validated = validatePredictionResult(name, parsed);
+
+                return NextResponse.json({
+                    ...validated,
+                    provider: data.model || "llm-race"
+                });
+            } catch (error) {
+                lastError = error instanceof Error ? error : new Error(String(error));
+                console.warn(`Prediction attempt ${attempt} failed:`, lastError.message);
+            }
         }
 
-        const data = await response.json() as CompletionResponse;
-        const content = data.choices?.[0]?.message?.content;
-        if (typeof content !== "string") throw new Error("Model returned no content");
-
-        // Handle potential markdown backticks in response
-        const cleanContent = content.replace(/```json|```/g, "").trim();
-        const parsed = JSON.parse(cleanContent);
-
-        const validated = validatePredictionResult(name, parsed);
-
-        return NextResponse.json({
-            ...validated,
-            provider: data.model || "llm-race"
-        });
+        throw lastError || new Error("Prediction failed");
 
     } catch (error: any) {
         console.error("Error in prediction route:", error);
